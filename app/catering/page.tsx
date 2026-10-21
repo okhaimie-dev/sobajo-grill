@@ -1,6 +1,6 @@
 import { asset } from "@/lib/assets";
 import { CATERING_FAQS } from "@/lib/faq";
-import { DELIVERY_FEE, DELIVERY_MINIMUM, MENU_SECTIONS } from "@/lib/menu";
+import { MENU_SECTIONS } from "@/lib/menu";
 import { pageMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 import { cateringServiceJsonLd, faqJsonLd } from "@/lib/structured-data";
@@ -34,7 +34,7 @@ const OCCASIONS: { label: string; text: string; icon: IconName }[] = [
 const STEPS = [
   ["Choose your trays", "Pick dishes and pan sizes below, or ask us to build the spread."],
   ["Set the date", "24 hours' notice preferred — earlier for big events."],
-  ["Pickup or delivery", `Pick up at our Liberty Road kitchen, or get it delivered via DoorDash ($${DELIVERY_MINIMUM} minimum, $${DELIVERY_FEE} fee).`],
+  ["Pickup or delivery", "Pick up at our Liberty Road kitchen, or get it delivered via DoorDash."],
   ["We bring the fire", "Everything arrives hot, with onions and Sobajo hot sauce."],
 ];
 

@@ -1,12 +1,11 @@
 "use client";
 
-import { DELIVERY_FEE, DELIVERY_MINIMUM } from "@/lib/menu";
 import { SITE } from "@/lib/site";
 import { useCart } from "./cart-context";
 import { Icon, IconName } from "./icons";
 
 const STATS: { icon: IconName; value: string; label: string }[] = [
-  { icon: "bag", value: `$${DELIVERY_MINIMUM}`, label: "Order minimum" },
+  { icon: "bag", value: "No minimum", label: "Order exactly what you're craving" },
   { icon: "store", value: "Pickup", label: "Order ahead on Liberty Road" },
   { icon: "clock", value: "24 hrs", label: "Advance notice preferred" },
   { icon: "truck", value: "DoorDash", label: "Delivered by DoorDash Dashers" },
@@ -28,8 +27,8 @@ export default function Delivery() {
             </h2>
           </div>
           <p className="section-lede">
-            Premium delivery for family meals, game nights, office lunches and catering — a flat
-            ${DELIVERY_FEE} fee across the Baltimore area.
+            Delivery for family meals, game nights, office lunches and catering — brought to
+            your door by DoorDash, with no order minimum.
           </p>
         </div>
 

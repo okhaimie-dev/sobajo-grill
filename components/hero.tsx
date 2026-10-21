@@ -37,9 +37,10 @@ export default function Hero() {
           </Link>
         </div>
         <div className="hero-meta">
-          <span>
-            <Stars /> Loved on Google
-          </span>
+          <a href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
+            <Stars value={SITE.googleRating} label={`Rated ${SITE.googleRating} out of 5 on Google`} />
+            <strong>{SITE.googleRating}</strong> on Google
+          </a>
           <span>
             <Icon name="truck" /> Pickup · Delivery · Catering
           </span>

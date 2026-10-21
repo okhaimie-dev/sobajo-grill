@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { DELIVERY_MINIMUM } from "@/lib/menu";
 import { pageMetadata } from "@/lib/seo";
 import { menuJsonLd } from "@/lib/structured-data";
 import Cta from "@/components/cta";
@@ -39,7 +38,7 @@ export default function MenuPage() {
             <Icon name="store" /> Pickup in Baltimore
           </span>
           <span>
-            <Icon name="truck" /> Delivery · ${DELIVERY_MINIMUM} minimum
+            <Icon name="truck" /> Delivery via DoorDash · no minimum
           </span>
           <span>
             <Icon name="pepper" /> Mild to Extra Hot

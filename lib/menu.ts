@@ -40,8 +40,8 @@ export interface CartLine {
 
 export const SQUARE_CHECKOUT_URL = "https://squareup.com/your-sobajo-ordering-link"; // TODO: replace with the real Sobajo Square ordering link
 
-export const DELIVERY_FEE = 20;
-export const DELIVERY_MINIMUM = 100;
+// Delivery is fulfilled by DoorDash: no order minimum, and the delivery fee
+// is DoorDash's (shown at checkout) — so neither is modeled here.
 
 export const SPICE_OPTIONS = ["Mild", "Medium", "Hot", "Extra Hot"] as const;
 

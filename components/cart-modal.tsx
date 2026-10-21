@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { CartLine, money } from "@/lib/menu";
-import { DELIVERY_FEE, DELIVERY_MINIMUM, useCart } from "./cart-context";
+import { useCart } from "./cart-context";
 import { Icon } from "./icons";
 import { useDialog } from "./use-dialog";
 
@@ -38,8 +38,6 @@ export default function CartModal() {
   const ref = useDialog(cartOpen, closeCart);
 
   const isDelivery = orderType === "delivery";
-  const fee = isDelivery ? DELIVERY_FEE : 0;
-  const shortBy = Math.max(0, DELIVERY_MINIMUM - subtotal);
   const empty = lines.length === 0;
 
   return (
@@ -102,12 +100,9 @@ export default function CartModal() {
                 </div>
               </fieldset>
 
-              {isDelivery && shortBy > 0 && (
+              {isDelivery && (
                 <div className="notice" role="status">
-                  Add <strong>{money(shortBy)}</strong> more to unlock delivery (${DELIVERY_MINIMUM} minimum).
-                  <div className="progress" aria-hidden="true">
-                    <span style={{ width: `${Math.min(100, (subtotal / DELIVERY_MINIMUM) * 100)}%` }} />
-                  </div>
+                  Delivered by DoorDash — no order minimum. DoorDash&apos;s delivery fee is shown at checkout.
                 </div>
               )}
 
@@ -142,13 +137,15 @@ export default function CartModal() {
                   <span>Subtotal</span>
                   <span>{money(subtotal)}</span>
                 </div>
-                <div className="summary-row">
-                  <span>Delivery fee</span>
-                  <span>{isDelivery ? money(fee) : "—"}</span>
-                </div>
+                {isDelivery && (
+                  <div className="summary-row">
+                    <span>Delivery fee</span>
+                    <span>Set by DoorDash</span>
+                  </div>
+                )}
                 <div className="summary-row total">
-                  <span>Total</span>
-                  <span>{money(subtotal + fee)}</span>
+                  <span>{isDelivery ? "Total before delivery" : "Total"}</span>
+                  <span>{money(subtotal)}</span>
                 </div>
               </div>
             </>
@@ -164,7 +161,7 @@ export default function CartModal() {
             </div>
           )}
           <button className="btn btn-primary btn-block" onClick={() => setError(checkout({ isDelivery, address }))}>
-            Continue to secure checkout · {money(subtotal + fee)}
+            Continue to secure checkout · {money(subtotal)}
           </button>
           <button className="link-btn muted-link" style={{ justifySelf: "center", alignSelf: "center" }} onClick={clearCart}>
             Clear cart

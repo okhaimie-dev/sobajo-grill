@@ -65,6 +65,12 @@ export const SITE = {
   /** DoorDash store page — TODO: paste the listing URL; "Order on DoorDash" buttons appear once set. */
   doordashUrl: null as string | null,
   priceRange: "$$",
+  /**
+   * Google star rating shown in the hero. Update by hand now and then — the
+   * live figure is always on the Visit map. Kept to one decimal, no review
+   * count, so it doesn't go stale quickly.
+   */
+  googleRating: 4.9,
   cuisines: ["Nigerian", "Cameroonian", "West African", "Barbecue", "Suya"],
   /**
    * TODO: fill in real hours — they feed Google rich results ("Open now").

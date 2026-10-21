@@ -237,8 +237,11 @@ p { margin: 0; text-wrap: pretty; }
 .hero-meta > * { display: inline-flex; align-items: center; gap: 8px; }
 .hero-meta svg { width: 17px; height: 17px; color: var(--gold); flex: none; }
 .hero-meta a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
-.stars { display: inline-flex; gap: 2px; color: var(--gold); }
-.stars svg { width: 16px; height: 16px; }
+.stars { position: relative; display: inline-flex; color: var(--gold); line-height: 0; }
+.stars-empty, .stars-fill { display: inline-flex; gap: 2px; }
+.stars-empty { opacity: 0.25; }
+.stars-fill { position: absolute; inset: 0 auto 0 0; overflow: hidden; white-space: nowrap; }
+.stars svg { width: 16px; height: 16px; flex: none; }
 
 /* ---------- sub-page hero ---------- */
 .page-hero {

@@ -10,8 +10,6 @@ import {
 } from "react";
 import {
   CartLine,
-  DELIVERY_FEE,
-  DELIVERY_MINIMUM,
   MenuItem,
   hasSpiceOption,
   sideOptions,
@@ -142,11 +140,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     (delivery: { isDelivery: boolean; address: string }) => {
       const { isDelivery, address } = delivery;
       if (!lines.length) return "Please add at least one item.";
-      if (isDelivery && subtotal < DELIVERY_MINIMUM)
-        return `Delivery orders require a $${DELIVERY_MINIMUM} minimum.`;
       if (isDelivery && !address.trim()) return "Please enter a delivery address.";
       track("begin_checkout", {
-        value: subtotal + (isDelivery ? DELIVERY_FEE : 0),
+        value: subtotal,
         fulfillment: isDelivery ? "delivery" : "pickup",
         items: lines.map((l) => ({ item_name: l.name, item_variant: l.variation, price: l.unitPrice, quantity: l.quantity })),
       });
@@ -192,4 +188,4 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
-export { DELIVERY_FEE, DELIVERY_MINIMUM, hasSpiceOption, sideOptions };
+export { hasSpiceOption, sideOptions };

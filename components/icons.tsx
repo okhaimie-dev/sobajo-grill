@@ -63,12 +63,15 @@ export function Icon({ name, ...props }: { name: IconName } & SVGProps<SVGSVGEle
   );
 }
 
-export function Stars({ count = 5, label = "5 out of 5 stars" }: { count?: number; label?: string }) {
+/** Five stars filled to `value` (e.g. 4.9 → the last star 90% filled). */
+export function Stars({ value = 5, label }: { value?: number; label?: string }) {
+  const row = Array.from({ length: 5 }, (_, i) => <Icon key={i} name="star" />);
   return (
-    <span className="stars" role="img" aria-label={label}>
-      {Array.from({ length: count }, (_, i) => (
-        <Icon key={i} name="star" />
-      ))}
+    <span className="stars" role="img" aria-label={label ?? `${value} out of 5 stars`}>
+      <span className="stars-empty">{row}</span>
+      <span className="stars-fill" style={{ width: `${(Math.max(0, Math.min(5, value)) / 5) * 100}%` }}>
+        {row}
+      </span>
     </span>
   );
 }
