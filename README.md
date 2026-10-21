@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sobajo Grill — Next.js Site
 
-## Getting Started
+A Next.js (App Router, TypeScript) port of the **"Branded Full Menu & Ordering Demo"**
+page for Sobajo Grill — the Baltimore barbecue & suya brand
+("Fire. Flavor. Friendship." / *Sobajo means friend*).
 
-First, run the development server:
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # http://localhost:3000
+npm run build && npm run start   # production
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## What's included
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Same look & behavior as the demo HTML, rebuilt with React components:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Sections** — Hero, Signature Experiences, Full Menu, Catering, Delivery,
+  Shipping (nationwide "coming soon"), Our Story, Reviews, CTA, Footer.
+- **Full menu data** — all 29 demo items (bowls, fire-grilled collection,
+  Ndokoti experience, catering trays, sides, drinks) in `lib/menu.ts`.
+- **Ordering demo** — cart with item customization modal (variation, spice
+  level, side, quantity, notes), pickup/delivery with $100 minimum + $20 fee,
+  and "Continue to Square Checkout".
+- **Brand assets** — the flame logo (extracted from the demo page) and the hero
+  photo live in `public/`.
 
-## Learn More
+## Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  layout.tsx         # metadata + CartProvider
+  page.tsx           # section assembly
+  globals.css        # demo styling ported verbatim
+  icon.png           # favicon
+components/
+  cart-context.tsx   # cart state, pricing rules, checkout validation (client)
+  nav.tsx hero.tsx experiences.tsx menu-sections.tsx catering.tsx
+  delivery.tsx shipping.tsx story.tsx reviews.tsx cta.tsx footer.tsx
+  item-modal.tsx cart-modal.tsx cart-fab.tsx
+lib/
+  menu.ts            # items, variations, prices, delivery rules
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Before going live
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Replace the placeholder Square link in **`lib/menu.ts` → `SQUARE_CHECKOUT_URL`**
+  (also the Cash App "Start Order" link in `components/cta.tsx`).
+- Menu card imagery is hot-linked from Unsplash URLs in `lib/menu.ts` — swap in
+  real food photography when available.
+- Delivery rules ($100 minimum, $20 fee) are constants in `lib/menu.ts`.
