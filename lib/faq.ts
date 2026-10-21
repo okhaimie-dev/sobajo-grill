@@ -16,7 +16,7 @@ export const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Do you deliver?",
-    a: `Yes. Sobajo delivers up to 20 miles with a dedicated driver. Delivery orders have a $${DELIVERY_MINIMUM} minimum and a $${DELIVERY_FEE} delivery fee, and 24 hours' notice is preferred.`,
+    a: `Yes — delivery is handled by DoorDash. Delivery orders have a $${DELIVERY_MINIMUM} minimum and a $${DELIVERY_FEE} delivery fee, and 24 hours' notice is preferred. You can also order ahead for pickup.`,
   },
   {
     q: "Do you cater events?",
@@ -48,7 +48,7 @@ export const CATERING_FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Do you deliver catering orders?",
-    a: `Yes. A dedicated Sobajo driver delivers up to 20 miles. Delivery orders have a $${DELIVERY_MINIMUM} minimum and a $${DELIVERY_FEE} delivery fee. Pickup is available at ${SITE.address.street}, ${SITE.address.city}.`,
+    a: `Yes — catering delivery is handled by DoorDash. Delivery orders have a $${DELIVERY_MINIMUM} minimum and a $${DELIVERY_FEE} delivery fee. Pickup is available at ${SITE.address.street}, ${SITE.address.city}.`,
   },
   {
     q: "Can I choose the spice level for catering trays?",

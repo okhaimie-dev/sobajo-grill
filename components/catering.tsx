@@ -24,7 +24,7 @@ export default function Catering() {
           <h2 id="catering-title">Bring the Sobajo experience to your event.</h2>
           <p className="lede">
             Half and full pans of brisket suya, Obasanjo Fire Chicken, wings, turkey wings and
-            grilled fish — delivered hot by a dedicated Sobajo driver.
+            grilled fish — for pickup, or delivered hot via DoorDash.
           </p>
           <ul className="occasions" aria-label="Perfect for">
             {OCCASIONS.map((o) => (

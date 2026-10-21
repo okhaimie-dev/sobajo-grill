@@ -68,6 +68,13 @@ export default function Footer() {
                 TikTok {socials.tiktok.handle}
               </a>
             </li>
+            {SITE.doordashUrl && (
+              <li>
+                <a href={SITE.doordashUrl} target="_blank" rel="noopener noreferrer">
+                  Order on DoorDash
+                </a>
+              </li>
+            )}
             <li>
               <a href={SITE.cashAppUrl} target="_blank" rel="noopener noreferrer">
                 Cash App $sobajogrillmd

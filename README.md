@@ -12,18 +12,17 @@ npm run dev     # http://localhost:3000
 npm run build && npm run start   # production
 ```
 
-## Deploying to GitHub Pages
+## Deploying
 
-The site exports fully statically (`output: "export"`) and deploys from
-`main` via `.github/workflows/deploy.yml`:
+Production runs on **Vercel** (https://sobajo-grill.vercel.app), wired to this
+GitHub repo: every push to `main` deploys to production, and every other
+branch gets its own preview URL.
 
-https://okhaimie-dev.github.io/sobajo-grill/
-
-- CI bakes asset links under the repo sub-path with
-  `NEXT_PUBLIC_BASE_PATH=/sobajo-grill` (see `next.config.ts` and
-  `lib/assets.ts`). Any other sub-path host can reuse the same env var.
-- Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**
-  is selected automatically by this workflow's first run.
+- Canonical/OG/sitemap URLs resolve from `NEXT_PUBLIC_SITE_URL`, falling back
+  to Vercel's production domain (`lib/site.ts`). When `sobajogrill.com` is
+  attached in Vercel, set `NEXT_PUBLIC_SITE_URL=https://sobajogrill.com`.
+- `NEXT_PUBLIC_BASE_PATH` is still honored for sub-path hosts but is unset on
+  Vercel. (The old GitHub Pages workflow has been retired.)
 
 ## What's included
 

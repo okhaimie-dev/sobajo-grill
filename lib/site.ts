@@ -7,12 +7,18 @@
 import { BASE_PATH } from "./assets";
 
 /**
- * Canonical public origin + base path, no trailing slash. CI sets
- * NEXT_PUBLIC_SITE_URL; switch it to https://sobajogrill.com once the custom
- * domain is live (robots.txt is only honored at a domain root).
+ * Canonical public origin + base path, no trailing slash. Resolution order:
+ * 1. NEXT_PUBLIC_SITE_URL — set this to https://sobajogrill.com once the
+ *    custom domain is live (robots.txt is only honored at a domain root).
+ * 2. Vercel's production domain (system env, available at build time) — so
+ *    preview deploys still canonicalize to production, not to themselves.
+ * 3. Local dev.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? `https://okhaimie-dev.github.io${BASE_PATH}`
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}${BASE_PATH}`
+    : `http://localhost:3000${BASE_PATH}`)
 ).replace(/\/$/, "");
 
 /** Absolute URL for a root-relative path ("/hero.jpg", "/menu/"). */
@@ -56,6 +62,8 @@ export const SITE = {
     tiktok: { handle: "@sobajogrill", url: "https://www.tiktok.com/@sobajogrill" },
   },
   cashAppUrl: "https://cash.app/$sobajogrillmd",
+  /** DoorDash store page — TODO: paste the listing URL; "Order on DoorDash" buttons appear once set. */
+  doordashUrl: null as string | null,
   priceRange: "$$",
   cuisines: ["Nigerian", "Cameroonian", "West African", "Barbecue", "Suya"],
   /**

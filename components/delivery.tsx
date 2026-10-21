@@ -1,14 +1,15 @@
 "use client";
 
 import { DELIVERY_FEE, DELIVERY_MINIMUM } from "@/lib/menu";
+import { SITE } from "@/lib/site";
 import { useCart } from "./cart-context";
 import { Icon, IconName } from "./icons";
 
 const STATS: { icon: IconName; value: string; label: string }[] = [
   { icon: "bag", value: `$${DELIVERY_MINIMUM}`, label: "Order minimum" },
-  { icon: "route", value: "20 miles", label: "Delivery radius" },
+  { icon: "store", value: "Pickup", label: "Order ahead on Liberty Road" },
   { icon: "clock", value: "24 hrs", label: "Advance notice preferred" },
-  { icon: "driver", value: "Sobajo", label: "Dedicated driver, not an app" },
+  { icon: "truck", value: "DoorDash", label: "Delivered by DoorDash Dashers" },
 ];
 
 export default function Delivery() {
@@ -20,7 +21,7 @@ export default function Delivery() {
         <div className="section-head">
           <div>
             <div className="eyebrow">
-              <Icon name="truck" /> Delivery by Sobajo
+              <Icon name="truck" /> Delivery via DoorDash
             </div>
             <h2 className="section-title" id="delivery-title">
               Fresh. Hot. <em>Delivered.</em>
@@ -61,10 +62,15 @@ export default function Delivery() {
               <span>Pay through Square — we handle the rest.</span>
             </div>
           </li>
-          <li className="step-cta">
+          <li className="step-cta" style={{ flexDirection: "column", alignItems: "stretch", gap: 10 }}>
             <button className="btn btn-primary" onClick={openCart}>
               Review my order <Icon name="arrow" />
             </button>
+            {SITE.doordashUrl && (
+              <a className="btn btn-ghost" href={SITE.doordashUrl} target="_blank" rel="noopener noreferrer">
+                Order on DoorDash
+              </a>
+            )}
           </li>
         </ol>
       </div>

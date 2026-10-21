@@ -13,7 +13,7 @@ import PageHero from "@/components/page-hero";
 
 export const metadata = pageMetadata({
   title: "Catering in Baltimore — African BBQ & Suya Trays",
-  description: `Cater your next event with Sobajo Grill: half and full pans of beef brisket suya, Obasanjo Fire Chicken, wings, turkey wings and grilled fish. Delivered by a dedicated driver up to 20 miles from Baltimore. Trays from $50.`,
+  description: `Cater your next event with Sobajo Grill: half and full pans of beef brisket suya, Obasanjo Fire Chicken, wings, turkey wings and grilled fish. Pickup in Baltimore or delivery via DoorDash. Trays from $50.`,
   path: "/catering/",
 });
 
@@ -33,7 +33,7 @@ const OCCASIONS: { label: string; text: string; icon: IconName }[] = [
 const STEPS = [
   ["Choose your trays", "Pick dishes and pan sizes below, or ask us to build the spread."],
   ["Set the date", "24 hours' notice preferred — earlier for big events."],
-  ["Pickup or delivery", `Dedicated Sobajo driver up to 20 miles ($${DELIVERY_MINIMUM} minimum, $${DELIVERY_FEE} fee).`],
+  ["Pickup or delivery", `Pick up at our Liberty Road kitchen, or get it delivered via DoorDash ($${DELIVERY_MINIMUM} minimum, $${DELIVERY_FEE} fee).`],
   ["We bring the fire", "Everything arrives hot, with onions and Sobajo hot sauce."],
 ];
 
@@ -72,7 +72,7 @@ export default function CateringPage() {
             <Icon name="package" /> Half &amp; full pans
           </span>
           <span>
-            <Icon name="driver" /> Dedicated driver
+            <Icon name="truck" /> Pickup or DoorDash delivery
           </span>
           <span>
             <Icon name="clock" /> 24 hrs notice preferred

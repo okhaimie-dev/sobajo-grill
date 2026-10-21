@@ -85,10 +85,8 @@ export function restaurantJsonLd() {
         potentialAction: {
           "@type": "OrderAction",
           target: absoluteUrl("/menu/"),
-          deliveryMethod: [
-            "http://purl.org/goodrelations/v1#DeliveryModePickUp",
-            "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet",
-          ],
+          // Delivery is fulfilled by DoorDash (a third party), so only pickup is declared here.
+          deliveryMethod: ["http://purl.org/goodrelations/v1#DeliveryModePickUp"],
         },
       },
       {
@@ -125,7 +123,7 @@ export function cateringServiceJsonLd(trays: MenuSection) {
     serviceType: "Catering",
     name: `${SITE.name} Catering`,
     description:
-      "African barbecue and suya catering in Baltimore — half and full pans of brisket suya, fire-grilled chicken, wings, turkey wings and grilled fish, delivered by a dedicated Sobajo driver.",
+      "African barbecue and suya catering in Baltimore — half and full pans of brisket suya, fire-grilled chicken, wings, turkey wings and grilled fish, for pickup or delivery via DoorDash.",
     url: absoluteUrl("/catering/"),
     provider: { "@id": RESTAURANT_ID },
     areaServed: { "@type": "City", name: "Baltimore" },
