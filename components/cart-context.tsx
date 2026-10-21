@@ -17,6 +17,7 @@ import {
   sideOptions,
   SQUARE_CHECKOUT_URL,
 } from "@/lib/menu";
+import { track } from "@/lib/analytics";
 
 export interface CartConfig {
   variation: string;
@@ -97,6 +98,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const configureItem = useCallback((item: MenuItem) => {
     setCartOpen(false);
     setActiveItem(item);
+    track("view_item", { items: [{ item_name: item.name, item_category: item.section }] });
   }, []);
 
   const closeItem = useCallback(() => setActiveItem(null), []);
@@ -116,6 +118,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         notes: cfg.notes,
       },
     ]);
+    track("add_to_cart", {
+      value: cfg.unitBasePrice * cfg.quantity,
+      items: [{ item_name: item.name, item_variant: cfg.variation, item_category: item.section, price: cfg.unitBasePrice, quantity: cfg.quantity }],
+    });
     setActiveItem(null);
   }, []);
 
@@ -139,10 +145,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (isDelivery && subtotal < DELIVERY_MINIMUM)
         return `Delivery orders require a $${DELIVERY_MINIMUM} minimum.`;
       if (isDelivery && !address.trim()) return "Please enter a delivery address.";
+      track("begin_checkout", {
+        value: subtotal + (isDelivery ? DELIVERY_FEE : 0),
+        fulfillment: isDelivery ? "delivery" : "pickup",
+        items: lines.map((l) => ({ item_name: l.name, item_variant: l.variation, price: l.unitPrice, quantity: l.quantity })),
+      });
       window.open(SQUARE_CHECKOUT_URL, "_blank", "noopener");
       return null;
     },
-    [lines.length, subtotal]
+    [lines, subtotal]
   );
 
   const value = useMemo<CartContextValue>(

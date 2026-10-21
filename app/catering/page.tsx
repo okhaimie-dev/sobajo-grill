@@ -2,12 +2,13 @@ import { asset } from "@/lib/assets";
 import { CATERING_FAQS } from "@/lib/faq";
 import { DELIVERY_FEE, DELIVERY_MINIMUM, MENU_SECTIONS } from "@/lib/menu";
 import { pageMetadata } from "@/lib/seo";
-import { CATERING_QUOTE_HREF, SITE } from "@/lib/site";
+import { SITE } from "@/lib/site";
 import { cateringServiceJsonLd, faqJsonLd } from "@/lib/structured-data";
 import CateringTrays from "@/components/catering-trays";
 import Faq from "@/components/faq";
 import { Icon, IconName } from "@/components/icons";
 import JsonLd from "@/components/json-ld";
+import LeadForm from "@/components/lead-form";
 import { Tiers } from "@/components/menu-items";
 import PageHero from "@/components/page-hero";
 
@@ -63,7 +64,7 @@ export default function CateringPage() {
           <a className="btn btn-primary" href="#trays">
             See tray pricing <Icon name="arrow" />
           </a>
-          <a className="btn btn-ghost" href={CATERING_QUOTE_HREF}>
+          <a className="btn btn-ghost" href="#quote">
             <Icon name="mail" /> Request a quote
           </a>
         </div>
@@ -104,7 +105,7 @@ export default function CateringPage() {
             ))}
             <li className="occasion occasion-cta">
               <strong>Something else?</strong>
-              <a className="text-link" href={CATERING_QUOTE_HREF}>
+              <a className="text-link" href="#quote">
                 Tell us about it <Icon name="arrow" />
               </a>
             </li>
@@ -168,6 +169,28 @@ export default function CateringPage() {
         </div>
       </section>
 
+      <section className="section" id="quote" aria-labelledby="quote-title">
+        <div className="container quote-grid">
+          <div>
+            <div className="eyebrow">Request a quote</div>
+            <h2 className="section-title" id="quote-title">
+              Let&apos;s plan your <em>spread.</em>
+            </h2>
+            <p className="section-lede" style={{ marginTop: 16 }}>
+              Share your date, guest count and location and we&apos;ll put together the perfect
+              Sobajo feast. Prefer to talk? Call{" "}
+              <a href={`tel:${SITE.phoneE164}`} style={{ color: "var(--gold)", fontWeight: 700 }}>
+                {SITE.phone}
+              </a>
+              .
+            </p>
+          </div>
+          <div className="quote-card">
+            <LeadForm kind="catering" />
+          </div>
+        </div>
+      </section>
+
       <Faq
         faqs={CATERING_FAQS}
         title={
@@ -181,10 +204,10 @@ export default function CateringPage() {
       <section aria-labelledby="catering-cta-title">
         <div className="container">
           <div className="cta-band">
-            <h2 id="catering-cta-title">Let&apos;s plan your spread.</h2>
-            <p>Send your date, guest count and location — we&apos;ll put together the perfect Sobajo feast.</p>
+            <h2 id="catering-cta-title">Bring the fire to your event.</h2>
+            <p>Tell us about your gathering and we&apos;ll handle the rest — pickup or delivery via DoorDash.</p>
             <div className="hero-actions">
-              <a className="btn btn-dark" href={CATERING_QUOTE_HREF}>
+              <a className="btn btn-dark" href="#quote">
                 <Icon name="mail" /> Request a quote
               </a>
               <a className="btn btn-ghost" href={`tel:${SITE.phoneE164}`}>

@@ -48,6 +48,26 @@ branch gets its own preview URL.
 > Internal links must use `next/link` (`<Link href="/menu/">`) — it adds the
 > GitHub Pages base path; a plain `<a href="/menu/">` would 404 there.
 
+## Marketing & leads
+
+- **Lead capture** — catering quote form (`/catering/#quote`), shipping
+  waitlist, and footer newsletter all post to **`/api/leads`**
+  (`app/api/leads/route.ts`): validation, honeypot, per-IP rate limit.
+- **CRM** — leads go to **Twenty** (`lib/leads/twenty.ts`): the Person is
+  found-or-created by email, a Note records the details + attribution, and
+  catering requests also open an **Opportunity** in the pipeline.
+- **Notifications** — `LEAD_WEBHOOK_URL` pings Slack/Discord/Zapier on every
+  lead, and doubles as the fallback if the CRM write fails.
+- **Attribution** — `lib/attribution.ts` stores first- and last-touch UTM
+  tags, Google/Meta click IDs, referrer and landing page; every lead carries it.
+- **Analytics** — GA4 + Meta Pixel load only when their IDs are set
+  (`components/analytics.tsx`); `lib/analytics.ts → track()` sends
+  `view_item`, `add_to_cart`, `begin_checkout`, `generate_lead`, `sign_up`.
+
+Configuration lives in environment variables — see `.env.example`. With no
+CRM or webhook configured, production refuses lead submissions (503) and the
+forms offer an email fallback rather than silently dropping leads.
+
 ## Structure
 
 ```
@@ -69,7 +89,11 @@ components/
   faq.tsx json-ld.tsx use-dialog.ts icons.tsx
   nav hero marquee experiences catering delivery story reviews shipping
   cta footer item-modal cart-modal cart-fab
+app/api/leads/route.ts   # lead intake → CRM + notification
 lib/
+  leads/              # schema.ts (validation), twenty.ts (CRM), notify.ts (webhook)
+  attribution.ts      # first/last-touch UTM + click-ID capture
+  analytics.ts        # track() → GA4 + Meta Pixel
   site.ts             # business facts: name, address, phone, socials, hours, SITE_URL
   seo.ts              # pageMetadata() + shared OG image
   menu.ts             # items, variations, prices, delivery rules

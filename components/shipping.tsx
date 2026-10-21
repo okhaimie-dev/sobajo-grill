@@ -1,5 +1,5 @@
-import { SITE } from "@/lib/site";
 import { Icon, IconName } from "./icons";
+import LeadForm from "./lead-form";
 
 const PRODUCTS: { name: string; text: string; icon: IconName }[] = [
   { name: "Sobajo Suya Spice", text: "Authentic Sobajo seasoning for grilling and cooking at home.", icon: "pepper" },
@@ -14,8 +14,6 @@ const STEPS = [
   ["Pay securely", "Square checkout"],
   ["Track shipment", "USPS or UPS"],
 ];
-
-const WAITLIST_HREF = `mailto:${SITE.email}?subject=${encodeURIComponent("Sobajo Shipping Waitlist")}`;
 
 export default function Shipping() {
   return (
@@ -56,9 +54,9 @@ export default function Shipping() {
               Shelf-stable products like suya spice and hot sauce launch first. Perishables follow
               once cold-chain packaging, labeling and carrier requirements are approved and tested.
             </p>
-            <a className="btn btn-primary" href={WAITLIST_HREF}>
-              <Icon name="mail" /> Join the shipping list
-            </a>
+            <div style={{ marginTop: 22 }}>
+              <LeadForm kind="waitlist" compact />
+            </div>
           </div>
           <ol className="ship-steps" aria-label="How shipping will work">
             {STEPS.map(([a, b]) => (

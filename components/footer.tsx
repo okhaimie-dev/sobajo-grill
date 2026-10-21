@@ -2,6 +2,7 @@ import Link from "next/link";
 import { asset } from "@/lib/assets";
 import { SITE } from "@/lib/site";
 import { Icon } from "./icons";
+import LeadForm from "./lead-form";
 
 const EXPLORE_LINKS = [
   { href: "/menu/", label: "Full menu" },
@@ -17,6 +18,13 @@ export default function Footer() {
   const { address, socials } = SITE;
   return (
     <footer className="footer">
+      <div className="container newsletter">
+        <div>
+          <h2 className="newsletter-title">Join the Sobajo family.</h2>
+          <p>Specials, new drops and first dibs on shipping — straight to your inbox.</p>
+        </div>
+        <LeadForm kind="newsletter" compact />
+      </div>
       <div className="container footer-grid">
         <div>
           <img src={asset("/logo.png")} alt="Sobajo Grill" className="footer-logo" width={480} height={325} loading="lazy" />

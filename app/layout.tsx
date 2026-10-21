@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
 import "./globals.css";
+import Analytics from "@/components/analytics";
 import { CartProvider } from "@/components/cart-context";
 import CartFab from "@/components/cart-fab";
 import CartModal from "@/components/cart-modal";
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <ItemModal />
           <CartModal />
         </CartProvider>
+        <Analytics />
       </body>
     </html>
   );

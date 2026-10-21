@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { asset } from "@/lib/assets";
-import { CATERING_QUOTE_HREF } from "@/lib/site";
 import { Icon } from "./icons";
 
 const OCCASIONS = [
@@ -35,9 +34,9 @@ export default function Catering() {
             <Link className="btn btn-gold" href="/catering/">
               Explore catering <Icon name="arrow" />
             </Link>
-            <a className="btn btn-ghost" href={CATERING_QUOTE_HREF}>
+            <Link className="btn btn-ghost" href="/catering/#quote">
               <Icon name="mail" /> Request a quote
-            </a>
+            </Link>
           </div>
         </div>
         <div className="split-media">
