@@ -71,6 +71,11 @@ branch gets its own preview URL.
   page view, rate-limited per IP. Falls back to the built-in quotes and a
   directions link when keys are unset.
 
+- **Reviews** — "What our guests say" shows live Google reviews when the
+  Places API is enabled, otherwise the hand-picked reviews in
+  `lib/reviews.ts`. Paste real Google reviews there (author, rating, link);
+  only entries with a Google link are labeled "Google review".
+
 Configuration lives in environment variables — see `.env.example`. With no
 CRM or webhook configured, production refuses lead submissions (503) and the
 forms offer an email fallback rather than silently dropping leads.

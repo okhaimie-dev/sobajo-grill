@@ -2,16 +2,42 @@
 
 import { useRef } from "react";
 import type { GooglePlace, GoogleReview } from "@/lib/google-place";
+import { CURATED_REVIEWS, CuratedReview } from "@/lib/reviews";
 import { SITE } from "@/lib/site";
 import { Icon, Stars } from "./icons";
 import { useGooglePlace } from "./use-google-place";
 
-// Shown until live Google reviews load, and whenever the Places API isn't configured.
-const FALLBACK = [
-  "The best suya spot in Baltimore — fresh, flavorful, and always cooked just right.",
-  "Made with love. The smoky jollof and flavorful meat are 10/10 every time.",
-  "So good we ship it to family in Texas. Beck is the suya king.",
-];
+/** Hand-picked review (lib/reviews.ts) — "Google review" only when it links to the original. */
+function CuratedReviewCard({ r }: { r: CuratedReview }) {
+  const source = r.url ? "Google review" : "Customer review";
+  return (
+    <figure className="review">
+      {r.rating ? <Stars value={r.rating} /> : null}
+      <blockquote className="review-text">“{r.text}”</blockquote>
+      <figcaption className="review-author">
+        {r.author && (
+          <span className="avatar-fallback" aria-hidden="true">
+            {r.author.charAt(0)}
+          </span>
+        )}
+        <span>
+          {r.author ?? source}
+          <small>
+            {[r.author ? source : null, r.date].filter(Boolean).join(" · ")}
+            {r.url && (
+              <>
+                {r.author || r.date ? " · " : ""}
+                <a href={r.url} target="_blank" rel="noopener noreferrer">
+                  View on Google Maps
+                </a>
+              </>
+            )}
+          </small>
+        </span>
+      </figcaption>
+    </figure>
+  );
+}
 
 function GoogleReviewCard({ r }: { r: GoogleReview }) {
   return (
@@ -85,22 +111,22 @@ export default function Reviews() {
           {place ? (
             <RatingSummary place={place} />
           ) : (
-            <p className="section-lede">
-              Real words from the friends and families who keep coming back for the flavor.
-            </p>
+            <a className="rating-summary" href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
+              <strong>{SITE.googleRating.toFixed(1)}</strong>
+              <div>
+                <Stars value={SITE.googleRating} label={`Rated ${SITE.googleRating} out of 5 on Google`} />
+                <span className="rating-count">
+                  on <b>Google</b> · read our reviews
+                </span>
+              </div>
+            </a>
           )}
         </div>
 
         <div className="review-grid" aria-busy={state.status === "loading"}>
           {place
             ? place.reviews.slice(0, 3).map((r) => <GoogleReviewCard key={r.author + r.publishTime} r={r} />)
-            : FALLBACK.map((r) => (
-                <figure className="review" key={r}>
-                  <Stars />
-                  <blockquote>“{r}”</blockquote>
-                  <figcaption>Google review</figcaption>
-                </figure>
-              ))}
+            : CURATED_REVIEWS.map((r) => <CuratedReviewCard key={r.text} r={r} />)}
         </div>
 
         {place && (
