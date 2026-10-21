@@ -11,6 +11,7 @@ const EXPLORE_LINKS = [
   { href: "/#delivery", label: "Delivery" },
   { href: "/#shipping", label: "Nationwide shipping" },
   { href: "/#story", label: "Our story" },
+  { href: "/#visit", label: "Hours & directions" },
   { href: "/#faq", label: "FAQ" },
 ];
 

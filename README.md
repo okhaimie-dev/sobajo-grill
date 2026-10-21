@@ -64,6 +64,13 @@ branch gets its own preview URL.
   (`components/analytics.tsx`); `lib/analytics.ts → track()` sends
   `view_item`, `add_to_cart`, `begin_checkout`, `generate_lead`, `sign_up`.
 
+- **Google** — live rating, reviews and hours (`lib/google-place.ts` →
+  `/api/google-place`) and a Maps Embed map (`components/visit.tsx`). Google's
+  terms forbid caching reviews/ratings/hours, so they're fetched per visit —
+  but only when a visitor scrolls near the reviews/visit sections, once per
+  page view, rate-limited per IP. Falls back to the built-in quotes and a
+  directions link when keys are unset.
+
 Configuration lives in environment variables — see `.env.example`. With no
 CRM or webhook configured, production refuses lead submissions (503) and the
 forms offer an email fallback rather than silently dropping leads.
@@ -90,6 +97,7 @@ components/
   nav hero marquee experiences catering delivery story reviews shipping
   cta footer item-modal cart-modal cart-fab
 app/api/leads/route.ts   # lead intake → CRM + notification
+app/api/google-place/route.ts # live Google rating/reviews/hours (never cached)
 lib/
   leads/              # schema.ts (validation), twenty.ts (CRM), notify.ts (webhook)
   attribution.ts      # first/last-touch UTM + click-ID capture

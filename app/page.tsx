@@ -10,6 +10,7 @@ import Catering from "@/components/catering";
 import Delivery from "@/components/delivery";
 import Story from "@/components/story";
 import Reviews from "@/components/reviews";
+import Visit from "@/components/visit";
 import Shipping from "@/components/shipping";
 import Faq from "@/components/faq";
 import Cta from "@/components/cta";
@@ -29,6 +30,7 @@ export default function Home() {
       <Delivery />
       <Story />
       <Reviews />
+      <Visit />
       <Shipping />
       <Faq />
       <Cta />
