@@ -27,39 +27,51 @@ https://okhaimie-dev.github.io/sobajo-grill/
 
 ## What's included
 
-Same look & behavior as the demo HTML, rebuilt with React components:
-
-- **Sections** — Hero, Signature Experiences, Full Menu, Catering, Delivery,
-  Shipping (nationwide "coming soon"), Our Story, Reviews, CTA, Footer.
-- **Full menu data** — all 29 demo items (bowls, fire-grilled collection,
-  Ndokoti experience, catering trays, sides, drinks) in `lib/menu.ts`.
-- **Ordering demo** — cart with item customization modal (variation, spice
-  level, side, quantity, notes), pickup/delivery with $100 minimum + $20 fee,
-  and "Continue to Square Checkout".
-- **Brand assets** — the flame logo (extracted from the demo page) and the hero
-  photo live in `public/`.
+- **Sections** — Hero, Signature Experiences, Full Menu (sticky scroll-synced
+  category bar), Catering, Delivery, Our Story, Reviews, Shipping ("coming
+  soon" + waitlist), FAQ, CTA, Footer.
+- **Menu data** — all 29 items in `lib/menu.ts`; each section picks a layout
+  (`feature` · `cards` · `tiers` · `list`).
+- **Ordering** — native `<dialog>` item customizer (size/spice/side chips,
+  quantity stepper, live price) and cart sheet (pickup/delivery toggle, $100
+  delivery minimum with progress, inline validation) → Square checkout. Cart
+  persists in `localStorage`.
+- **SEO** — page metadata, canonical, Open Graph/Twitter card (`/og.png`,
+  generated at build), `sitemap.xml`, `robots.txt`, web manifest, and
+  schema.org JSON-LD (`Restaurant` + full `Menu` with prices, `WebSite`,
+  `FAQPage`).
 
 ## Structure
 
 ```
 app/
-  layout.tsx         # metadata + CartProvider
-  page.tsx           # section assembly
-  globals.css        # demo styling ported verbatim
-  icon.png           # favicon
+  layout.tsx          # fonts, metadata, viewport, JSON-LD
+  page.tsx            # section assembly
+  globals.css         # design tokens + all component styles
+  og.png/route.tsx    # 1200×630 social share card (build-time ImageResponse)
+  sitemap.ts robots.ts manifest.ts icon.png apple-icon.png
 components/
-  cart-context.tsx   # cart state, pricing rules, checkout validation (client)
-  nav.tsx hero.tsx experiences.tsx menu-sections.tsx catering.tsx
-  delivery.tsx shipping.tsx story.tsx reviews.tsx cta.tsx footer.tsx
-  item-modal.tsx cart-modal.tsx cart-fab.tsx
+  cart-context.tsx    # cart state, pricing rules, checkout validation (client)
+  use-dialog.ts       # React state ↔ native <dialog>
+  icons.tsx           # inline SVG icon set
+  nav hero marquee experiences menu-sections catering delivery story
+  reviews shipping faq cta footer item-modal cart-modal cart-fab
 lib/
-  menu.ts            # items, variations, prices, delivery rules
+  site.ts             # business facts: name, address, phone, socials, hours, SITE_URL
+  menu.ts             # items, variations, prices, delivery rules
+  faq.ts              # FAQ copy (rendered + FAQPage JSON-LD)
+  structured-data.ts  # schema.org JSON-LD builder
 ```
 
 ## Before going live
 
-- Replace the placeholder Square link in **`lib/menu.ts` → `SQUARE_CHECKOUT_URL`**
-  (also the Cash App "Start Order" link in `components/cta.tsx`).
-- Menu card imagery is hot-linked from Unsplash URLs in `lib/menu.ts` — swap in
-  real food photography when available.
-- Delivery rules ($100 minimum, $20 fee) are constants in `lib/menu.ts`.
+- **Business facts live in `lib/site.ts`** — fill in `hours` (feeds Google's
+  "Open now"); confirm phone, email and social URLs.
+- **Custom domain** — point `sobajogrill.com` at Pages, then set
+  `NEXT_PUBLIC_SITE_URL=https://sobajogrill.com` and drop
+  `NEXT_PUBLIC_BASE_PATH` in the workflow. `robots.txt` is only honored at a
+  domain root, and the canonical/OG URLs should be the brand domain.
+- Replace the placeholder Square link in **`lib/menu.ts` → `SQUARE_CHECKOUT_URL`**.
+- Menu card photos are Unsplash placeholders (`lib/menu.ts`) — swap in real
+  Sobajo food photography; `public/hero.jpg` is the only real dish photo today.
+- Reviews in `components/reviews.tsx` are static — wire to Google reviews.

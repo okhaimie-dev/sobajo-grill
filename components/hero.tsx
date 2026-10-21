@@ -1,42 +1,52 @@
 import { asset } from "@/lib/assets";
+import { SITE } from "@/lib/site";
+import { Icon, Stars } from "./icons";
 
 export default function Hero() {
   return (
-    <header
-      className="hero"
-      id="top"
-      style={{
-        backgroundImage: `linear-gradient(90deg,rgba(0,0,0,.94),rgba(0,0,0,.62)),url('${asset(
-          "/hero.jpg"
-        )}')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
+    <section className="hero" id="top" aria-labelledby="hero-title">
+      {/* Real <img> (not a CSS background) so it can be the prioritized LCP element. */}
+      <img
+        className="hero-media"
+        src={asset("/hero.jpg")}
+        srcSet={`${asset("/hero-960.jpg")} 960w, ${asset("/hero.jpg")} 1920w`}
+        sizes="100vw"
+        alt="Sobajo beef brisket suya cooking over an open flame grill"
+        width={1920}
+        height={1280}
+        fetchPriority="high"
+      />
       <div className="container hero-content">
-        <div className="eyebrow">Baltimore Suya Delicacies</div>
-        <h1>
-          Fire. Flavor. <span>Friendship.</span>
+        <div className="eyebrow">
+          <Icon name="flame" /> Baltimore Suya &amp; African Grill
+        </div>
+        <h1 id="hero-title">
+          Fire. Flavor. <span className="accent">Friendship.</span>
         </h1>
-        <p>
-          Baltimore Suya Delicacies rooted in Friendship • Heritage • Flavor •
-          Community.
+        <p className="hero-lede">
+          Fire-grilled beef brisket suya, Obasanjo Fire Chicken, smoky jollof and sweet
+          plantains — West African heritage meets American barbecue, right here in Baltimore.
         </p>
-        <div className="actions">
-          <a className="btn red" href="#menu">
-            Start Your Order
+        <div className="hero-actions">
+          <a className="btn btn-primary" href="#menu">
+            Start your order <Icon name="arrow" />
           </a>
-          <a className="btn gold" href="#delivery">
-            Schedule Delivery
+          <a className="btn btn-ghost" href="#catering">
+            Book catering
           </a>
-          <a className="btn dark" href="#catering">
-            Book Catering
-          </a>
-          <a className="btn dark" href="#shipping">
-            Nationwide Shipping
+        </div>
+        <div className="hero-meta">
+          <span>
+            <Stars /> Loved on Google
+          </span>
+          <span>
+            <Icon name="truck" /> Pickup · Delivery · Catering
+          </span>
+          <a href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
+            <Icon name="pin" /> {SITE.address.street}, {SITE.address.city}
           </a>
         </div>
       </div>
-    </header>
+    </section>
   );
 }

@@ -1,73 +1,74 @@
+import { asset } from "@/lib/assets";
+import { Icon } from "./icons";
+
 const U = (id: string) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=900&q=85`;
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=800&q=75`;
 
 const EXPERIENCES = [
   {
     title: "Chef's Recommendation",
-    text: "A curated introduction to the flavors that best represent Sobajo Grill—selected by the chef for guests who want to experience our signature style.",
+    text: "A curated introduction to the flavors that best represent Sobajo Grill — selected by the chef for first-time guests.",
     badge: "Chef's Pick",
-    href: "#menu",
-    cta: "Explore Menu",
-    ctaClass: "btn red",
-    image: U("photo-1504674900247-0877df9cc836"),
+    href: "#bowls",
+    cta: "Start with the signature",
+    image: U("photo-1529193591184-b1d58069ecdd"),
+    alt: "Sliced fire-grilled beef brisket",
   },
   {
     title: "Ndokoti Experience",
-    text: "Named after Carrefour Ndokoti in Douala, Cameroon—a crossroads where roads, journeys, people, and communities meet. At Sobajo, Ndokoti represents the table as a meeting place for food, culture, friendship, and community.",
-    badge: "Classic • Deluxe • Supreme • Royal",
+    text: "Named after Carrefour Ndokoti in Douala, Cameroon — the table as a crossroads for food, culture and friendship.",
+    badge: "Classic → Royal",
     href: "#ndokoti",
-    cta: "View Levels",
-    ctaClass: "btn gold",
-    image: U("photo-1555244162-803834f70033"),
+    cta: "Compare the levels",
+    image: asset("/story.jpg"),
+    alt: "A shared spread of grilled meats and sides",
   },
   {
     title: "Game Night Pack",
-    text: "Built for game nights, movie nights, friends, and family sharing.",
+    text: "Fire wings, grilled chicken and sides built for game nights, movie nights, friends and family sharing.",
     badge: "Built for Sharing",
-    href: "#menu",
-    cta: "Explore Menu",
-    ctaClass: "btn red",
-    image: U("photo-1552566626-52f8b828add9"),
+    href: "#grill",
+    cta: "Build your spread",
+    image: U("photo-1562967914-608f82629710"),
+    alt: "A platter of crispy wings with dipping sauce",
   },
   {
     title: "Friendship Feast",
-    text: "Our celebration experience for family gatherings and special occasions.",
+    text: "Our celebration experience for family gatherings, birthdays and special occasions.",
     badge: "Celebrate Together",
     href: "#catering",
-    cta: "Plan a Feast",
-    ctaClass: "btn red",
-    image: U("photo-1515003197210-e0cd71810b5f"),
+    cta: "Plan a feast",
+    image: asset("/catering.jpg"),
+    alt: "A catering buffet of trays and chafing dishes",
   },
 ];
 
 export default function Experiences() {
   return (
-    <section id="experiences" style={{ background: "#0b0b0b" }}>
+    <section className="section" id="experiences" aria-labelledby="experiences-title">
       <div className="container">
         <div className="section-head">
           <div>
             <div className="eyebrow">Sobajo Signature Experiences</div>
-            <h2>More than a meal. Choose your experience.</h2>
+            <h2 className="section-title" id="experiences-title">
+              More than a meal. <em>Choose your experience.</em>
+            </h2>
           </div>
-          <p>Built for first-time guests, sharing, game nights, and celebrations.</p>
+          <p className="section-lede">
+            Whether it&apos;s your first taste of suya or you&apos;re feeding the whole family,
+            start here.
+          </p>
         </div>
-        <div className="grid">
+        <div className="exp-grid">
           {EXPERIENCES.map((x) => (
-            <article className="card" key={x.title}>
-              <div
-                className="card-img"
-                style={{ backgroundImage: `url('${x.image}')` }}
-              />
-              <div className="card-body">
-                <h4>{x.title}</h4>
-                <p>{x.text}</p>
-                <div className="card-row">
-                  <span className="price">{x.badge}</span>
-                  <a className={x.ctaClass} href={x.href}>
-                    {x.cta}
-                  </a>
-                </div>
-              </div>
+            <article className="exp-card" key={x.title}>
+              <img src={x.image} alt={x.alt} loading="lazy" decoding="async" width={800} height={1000} />
+              <span className="chip chip-solid">{x.badge}</span>
+              <h3>{x.title}</h3>
+              <p>{x.text}</p>
+              <a className="text-link" href={x.href}>
+                {x.cta} <Icon name="arrow" />
+              </a>
             </article>
           ))}
         </div>

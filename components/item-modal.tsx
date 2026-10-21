@@ -5,162 +5,171 @@ import {
   MenuItem,
   SPICE_OPTIONS,
   hasSpiceOption,
+  money,
+  price,
   sideOptions,
 } from "@/lib/menu";
 import { useCart } from "./cart-context";
+import { Icon } from "./icons";
+import { itemImageProps } from "./menu-sections";
+import { useDialog } from "./use-dialog";
 
-/** Backdrop click + Escape close the modal. */
-function useBackdropClose(onClose: () => void, open: boolean) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-}
+type Spice = (typeof SPICE_OPTIONS)[number];
 
 export default function ItemModal() {
   const { activeItem, closeItem, addConfiguredItem } = useCart();
   const [variationIdx, setVariationIdx] = useState(0);
-  const [spice, setSpice] = useState<(typeof SPICE_OPTIONS)[number]>("Medium");
-  const [sideValue, setSideValue] = useState("No Side|0");
+  const [spice, setSpice] = useState<Spice>("Medium");
+  const [sideIdx, setSideIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
 
   const item: MenuItem | null = activeItem;
-  const open = item !== null;
-
-  useBackdropClose(closeItem, open);
+  const ref = useDialog(item !== null, closeItem);
 
   // Reset the form whenever a new item is being configured.
   useEffect(() => {
     if (!item) return;
     setVariationIdx(0);
     setSpice("Medium");
-    const sides = sideOptions(item);
-    setSideValue(sides.length ? `${sides[0][0]}|${sides[0][1]}` : "No Side|0");
+    setSideIdx(0);
     setQuantity(1);
     setNotes("");
   }, [item]);
 
-  if (!open || !item) return <div className="modal" id="itemModal" />;
-
-  const spices = hasSpiceOption(item);
-  const sides = sideOptions(item);
+  const spices = item ? hasSpiceOption(item) : false;
+  const sides = item ? sideOptions(item) : [];
+  const variation = item?.variations[variationIdx];
+  const side = sides[sideIdx];
+  const unit = (variation?.[1] ?? 0) + (side?.[1] ?? 0);
+  const img = item ? itemImageProps(item, "(max-width: 640px) 100vw, 640px") : null;
 
   const add = () => {
-    const [sideName, sideExtra] = sideValue.split("|");
-    const variation = item.variations[variationIdx];
+    if (!item || !variation) return;
     addConfiguredItem(item, {
       variation: variation[0],
-      unitBasePrice: variation[1] + Number(sideExtra),
-      quantity: Math.max(1, Number(quantity) || 1),
+      unitBasePrice: unit,
+      quantity: Math.max(1, quantity),
       spice: spices ? spice : "",
-      side: sides.length ? sideName : "",
-      sidePrice: Number(sideExtra),
+      side: side ? side[0] : "",
+      sidePrice: side?.[1] ?? 0,
       notes,
     });
   };
 
   return (
-    <div
-      className="modal open"
-      id="itemModal"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) closeItem();
-      }}
-    >
-      <div className="modal-card">
-        <div className="modal-head">
-          <div>
-            <div className="eyebrow">Customize Item</div>
-            <h3>{item.name}</h3>
+    <dialog ref={ref} className="modal dialog" aria-labelledby="item-title">
+      {item && variation && (
+        <>
+          <div className="modal-scroll">
+            {img ? (
+              <div className="modal-media">
+                <img {...img} alt="" />
+                <button className="icon-btn" onClick={closeItem} aria-label="Close">
+                  <Icon name="close" />
+                </button>
+              </div>
+            ) : null}
+            <div className="modal-head">
+              <div>
+                <div className="eyebrow">Customize</div>
+                <h2 id="item-title">{item.name}</h2>
+              </div>
+              {!img && (
+                <button className="icon-btn" onClick={closeItem} aria-label="Close">
+                  <Icon name="close" />
+                </button>
+              )}
+            </div>
+            <div className="modal-body">
+              <p className="muted">{item.description}</p>
+
+              {item.variations.length > 1 && (
+                <fieldset className="choices">
+                  <legend>Size</legend>
+                  <div className="choice-row">
+                    {item.variations.map(([name, p], idx) => (
+                      <label className="choice" key={name}>
+                        <input
+                          type="radio"
+                          name="variation"
+                          checked={variationIdx === idx}
+                          onChange={() => setVariationIdx(idx)}
+                        />
+                        <span>
+                          {name} <em>{price(p)}</em>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              )}
+
+              {spices && (
+                <fieldset className="choices">
+                  <legend>Spice level</legend>
+                  <div className="choice-row">
+                    {SPICE_OPTIONS.map((s, idx) => (
+                      <label className="choice" key={s}>
+                        <input type="radio" name="spice" checked={spice === s} onChange={() => setSpice(s)} />
+                        <span>
+                          {s}
+                          <span className="peppers" aria-hidden="true">
+                            {Array.from({ length: idx + 1 }, (_, i) => (
+                              <Icon key={i} name="pepper" />
+                            ))}
+                          </span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              )}
+
+              {sides.length > 0 && (
+                <fieldset className="choices">
+                  <legend>{item.sideMode === "included" ? "Included side" : "Add a side"}</legend>
+                  <div className="choice-row">
+                    {sides.map(([name, extra], idx) => (
+                      <label className="choice" key={name}>
+                        <input type="radio" name="side" checked={sideIdx === idx} onChange={() => setSideIdx(idx)} />
+                        <span>
+                          {name} {extra ? <em>+{price(extra)}</em> : null}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              )}
+
+              <label className="field">
+                <span className="field-label">Special instructions</span>
+                <textarea
+                  className="input"
+                  rows={2}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="e.g. extra onions, sauce on the side"
+                />
+              </label>
+            </div>
           </div>
-          <button className="close" onClick={closeItem} aria-label="Close">
-            ×
-          </button>
-        </div>
-        <p className="muted">{item.description}</p>
-        <div className="option-grid">
-          <label>
-            Variation
-            <select
-              id="variationSelect"
-              value={variationIdx}
-              onChange={(e) => setVariationIdx(Number(e.target.value))}
-            >
-              {item.variations.map((v, idx) => (
-                <option key={v[0]} value={idx}>
-                  {v[0]} — {`$${v[1]}`}
-                </option>
-              ))}
-            </select>
-          </label>
-          {spices && (
-            <label>
-              Spice Level
-              <select
-                id="spiceSelect"
-                value={spice}
-                onChange={(e) => setSpice(e.target.value as (typeof SPICE_OPTIONS)[number])}
-              >
-                {SPICE_OPTIONS.map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </select>
-            </label>
-          )}
-          {sides.length > 0 && (
-            <label>
-              Side
-              <select
-                id="sideSelect"
-                value={sideValue}
-                onChange={(e) => setSideValue(e.target.value)}
-              >
-                {sides.map(([name, extra]) => (
-                  <option key={name} value={`${name}|${extra}`}>
-                    {name}
-                    {extra ? ` — +$${extra}` : ""}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-          <label>
-            Quantity
-            <input
-              type="number"
-              id="quantityInput"
-              min={1}
-              value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-            />
-          </label>
-        </div>
-        <label>
-          Special Instructions
-          <textarea
-            id="notes"
-            rows={3}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Example: extra onions, sauce on the side"
-          />
-        </label>
-        <div className="actions">
-          <button className="btn red" onClick={add}>
-            Add to Cart
-          </button>
-          <button className="btn dark" onClick={closeItem}>
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
+          <div className="modal-foot">
+            <div className="stepper" role="group" aria-label="Quantity">
+              <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} disabled={quantity <= 1} aria-label="Decrease quantity">
+                <Icon name="minus" />
+              </button>
+              <output aria-live="polite">{quantity}</output>
+              <button onClick={() => setQuantity((q) => Math.min(99, q + 1))} aria-label="Increase quantity">
+                <Icon name="plus" />
+              </button>
+            </div>
+            <button className="btn btn-primary" style={{ flex: 1 }} onClick={add}>
+              Add to order · {money(unit * quantity)}
+            </button>
+          </div>
+        </>
+      )}
+    </dialog>
   );
 }
-
-export { useBackdropClose };

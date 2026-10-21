@@ -1,34 +1,26 @@
 "use client";
 
 import { useCart } from "./cart-context";
+import { Icon } from "./icons";
 
 export default function Cta() {
   const { openCart } = useCart();
 
   return (
-    <section>
+    <section aria-labelledby="cta-title">
       <div className="container">
-        <div className="cta">
-          <h2>Ready for the Sobajo experience?</h2>
+        <div className="cta-band">
+          <h2 id="cta-title">Ready for the Sobajo experience?</h2>
           <p>
-            Build your order, choose pickup or delivery, explore nationwide
-            shipping, and continue to Square checkout.
+            Build your order, choose pickup or delivery, and check out securely with Square.
           </p>
-          <div className="actions" style={{ justifyContent: "center" }}>
-            <a
-              className="btn red"
-              href="https://cash.app/$sobajogrillmd"
-              target="_blank"
-              rel="noopener"
-            >
-              Start Order
+          <div className="hero-actions">
+            <a className="btn btn-dark" href="#menu">
+              Start your order <Icon name="arrow" />
             </a>
-            <button className="btn dark" onClick={openCart}>
-              View Cart
+            <button className="btn btn-ghost" onClick={openCart}>
+              <Icon name="bag" /> View cart
             </button>
-            <a className="btn dark" href="#shipping">
-              Explore Shipping
-            </a>
           </div>
         </div>
       </div>

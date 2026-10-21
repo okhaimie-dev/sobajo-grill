@@ -41,8 +41,8 @@ interface CartContextValue {
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
-  /** Validate and open the Square checkout page, like the demo. */
-  checkout: (delivery: { isDelivery: boolean; address: string }) => void;
+  /** Validate and open the Square checkout page. Returns an error message, or null on success. */
+  checkout: (delivery: { isDelivery: boolean; address: string }) => string | null;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -135,19 +135,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const checkout = useCallback(
     (delivery: { isDelivery: boolean; address: string }) => {
       const { isDelivery, address } = delivery;
-      if (!lines.length) {
-        alert("Please add at least one item.");
-        return;
-      }
-      if (isDelivery && subtotal < DELIVERY_MINIMUM) {
-        alert(`Delivery orders require a $${DELIVERY_MINIMUM} minimum.`);
-        return;
-      }
-      if (isDelivery && !address.trim()) {
-        alert("Please enter a delivery address.");
-        return;
-      }
-      window.open(SQUARE_CHECKOUT_URL, "_blank");
+      if (!lines.length) return "Please add at least one item.";
+      if (isDelivery && subtotal < DELIVERY_MINIMUM)
+        return `Delivery orders require a $${DELIVERY_MINIMUM} minimum.`;
+      if (isDelivery && !address.trim()) return "Please enter a delivery address.";
+      window.open(SQUARE_CHECKOUT_URL, "_blank", "noopener");
+      return null;
     },
     [lines.length, subtotal]
   );

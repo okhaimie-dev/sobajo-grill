@@ -1,102 +1,73 @@
-const U = (id: string) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=900&q=85`;
+import { SITE } from "@/lib/site";
+import { Icon, IconName } from "./icons";
 
-const PRODUCTS = [
-  {
-    name: "Beef Brisket Suya Packs",
-    text: "Vacuum-sealed packs prepared for safe nationwide delivery.",
-    image: U("photo-1529042410759-befb1204b468"),
-  },
-  {
-    name: "Sobajo Suya Spice",
-    text: "Authentic Sobajo seasoning for grilling and cooking at home.",
-    image: U("photo-1596040033229-a9821ebd058d"),
-  },
-  {
-    name: "Sobajo Hot Sauce",
-    text: "Our bold house heat bottled for customers nationwide.",
-    image: U("photo-1585620385456-4759f9b5c7d9"),
-  },
-  {
-    name: "Sobajo Gift Packages",
-    text: "Curated boxes for birthdays, holidays, celebrations, and family surprises.",
-    image: U("photo-1549465220-1a8b9238cd48"),
-  },
+const PRODUCTS: { name: string; text: string; icon: IconName }[] = [
+  { name: "Sobajo Suya Spice", text: "Authentic Sobajo seasoning for grilling and cooking at home.", icon: "pepper" },
+  { name: "Sobajo Hot Sauce", text: "Our bold house heat, bottled for customers nationwide.", icon: "bottle" },
+  { name: "Beef Brisket Suya Packs", text: "Vacuum-sealed packs prepared for safe nationwide delivery.", icon: "package" },
+  { name: "Sobajo Gift Packages", text: "Curated boxes for birthdays, holidays and family surprises.", icon: "gift" },
 ];
+
+const STEPS = [
+  ["Choose products", "Select package size"],
+  ["Enter address", "Recipient and date"],
+  ["Pay securely", "Square checkout"],
+  ["Track shipment", "USPS or UPS"],
+];
+
+const WAITLIST_HREF = `mailto:${SITE.email}?subject=${encodeURIComponent("Sobajo Shipping Waitlist")}`;
 
 export default function Shipping() {
   return (
-    <section id="shipping" style={{ background: "#0d0d0d" }}>
+    <section className="section section-alt" id="shipping" aria-labelledby="shipping-title">
       <div className="container">
         <div className="section-head">
           <div>
-            <div className="eyebrow">Shipping Beyond Baltimore</div>
-            <h2>Send the Sobajo experience nationwide.</h2>
+            <div className="eyebrow">
+              <Icon name="globe" /> Shipping Beyond Baltimore
+            </div>
+            <h2 className="section-title" id="shipping-title">
+              Send Sobajo <em>nationwide.</em>
+            </h2>
           </div>
-          <p>
-            Share Sobajo with family and friends (Sobajo) across the country
-            through carefully packaged products and trackable shipping.
+          <p className="section-lede">
+            Share the flavor with family and friends across the country — carefully packaged,
+            trackable, and coming soon.
           </p>
         </div>
 
-        <div className="grid">
+        <div className="ship-grid">
           {PRODUCTS.map((p) => (
-            <article className="card" key={p.name}>
-              <div className="card-img" style={{ backgroundImage: `url('${p.image}')` }} />
-              <div className="card-body">
-                <h4>{p.name}</h4>
-                <p>{p.text}</p>
-                <div className="card-row">
-                  <span className="price">Coming Soon</span>
-                  <a className="btn dark" href="#shipping-process">
-                    Learn More
-                  </a>
-                </div>
+            <article className="ship-card" key={p.name}>
+              <div className="ship-icon">
+                <Icon name={p.icon} />
               </div>
+              <h3>{p.name}</h3>
+              <p>{p.text}</p>
+              <span className="chip">Coming soon</span>
             </article>
           ))}
         </div>
 
-        <div className="delivery-grid" id="shipping-process" style={{ marginTop: 28 }}>
-          <div className="panel">
-            <h3>How Shipping Will Work</h3>
-            <div className="info-row">
-              <span>1. Choose products</span>
-              <strong>Select package size</strong>
-            </div>
-            <div className="info-row">
-              <span>2. Enter address</span>
-              <strong>Recipient and date</strong>
-            </div>
-            <div className="info-row">
-              <span>3. Pay securely</span>
-              <strong>Square checkout</strong>
-            </div>
-            <div className="info-row">
-              <span>4. Track shipment</span>
-              <strong>Shippo with USPS or UPS</strong>
-            </div>
-          </div>
-          <div className="panel">
-            <h3>Shipping Launch Plan</h3>
+        <div className="waitlist">
+          <div>
+            <h3>Be first in line.</h3>
             <p>
-              Shelf-stable products such as suya spice and bottled sauce can launch
-              first. Perishable products will launch only after cold-chain
-              packaging, labeling, and carrier requirements are confirmed.
+              Shelf-stable products like suya spice and hot sauce launch first. Perishables follow
+              once cold-chain packaging, labeling and carrier requirements are approved and tested.
             </p>
-            <div className="notice" style={{ display: "block" }}>
-              Nationwide shipping is shown as “Coming Soon” until the fulfillment
-              process is fully approved and tested.
-            </div>
-            <div className="actions">
-              <a
-                className="btn red"
-                href="mailto:info@sobajogrill.com?subject=Sobajo%20Shipping%20Waitlist"
-              >
-                Join the Shipping List
-              </a>
-            </div>
+            <a className="btn btn-primary" href={WAITLIST_HREF}>
+              <Icon name="mail" /> Join the shipping list
+            </a>
           </div>
+          <ol className="ship-steps" aria-label="How shipping will work">
+            {STEPS.map(([a, b]) => (
+              <li key={a}>
+                <strong>{a}</strong>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>
