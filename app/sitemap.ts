@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { CAMPAIGNS } from "@/lib/campaigns";
 import { absoluteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -21,5 +22,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
       images: [absoluteUrl("/catering.jpg")],
     },
+    ...CAMPAIGNS.map((c) => ({
+      url: absoluteUrl(`/${c.slug}/`),
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
+    { url: absoluteUrl("/privacy/"), lastModified, changeFrequency: "yearly" as const, priority: 0.2 },
   ];
 }

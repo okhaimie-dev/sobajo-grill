@@ -5,12 +5,14 @@
  */
 
 import type { Attribution, Touch } from "@/lib/attribution";
+import { getCampaign } from "@/lib/campaigns";
 
-export const LEAD_KINDS = ["catering", "waitlist", "newsletter"] as const;
+export const LEAD_KINDS = ["catering", "preorder", "waitlist", "newsletter"] as const;
 export type LeadKind = (typeof LEAD_KINDS)[number];
 
 export const LEAD_LABELS: Record<LeadKind, string> = {
   catering: "Catering request",
+  preorder: "Pre-order request",
   waitlist: "Shipping waitlist",
   newsletter: "Newsletter signup",
 };
@@ -25,6 +27,12 @@ export interface Lead {
   guests?: number;
   location?: string;
   message?: string;
+  /** Campaign slug (pre-orders), validated against lib/campaigns.ts. */
+  campaign?: string;
+  /** YYYY-MM-DD */
+  pickupDate?: string;
+  /** Cart lines the guest had when they sent a pre-order (informational). */
+  items?: string[];
   /** Path the form was submitted from. */
   page?: string;
   attribution: Attribution;
@@ -74,7 +82,23 @@ export function parseLead(body: unknown, today = new Date()): Lead | string {
     },
   };
 
-  if (kind === "catering") {
+  if (kind === "preorder") {
+    if (!lead.name) return "Please tell us your name.";
+    if (!lead.phone) return "Please add a phone number so we can confirm your order.";
+    const campaign = getCampaign(str(b.campaign, 60) ?? "");
+    if (!campaign) return "Invalid request.";
+    lead.campaign = campaign.slug;
+    const date = str(b.pickupDate, 10);
+    if (date) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return "Please enter a valid pickup date.";
+      if (date < today.toISOString().slice(0, 10)) return "The pickup date is in the past.";
+      lead.pickupDate = date;
+    }
+    if (Array.isArray(b.items)) {
+      lead.items = b.items.map((i) => str(i, 200)).filter((i): i is string => Boolean(i)).slice(0, 30);
+    }
+  }
+  if (kind === "catering" || kind === "preorder") {
     if (!lead.name) return "Please tell us your name.";
     const date = str(b.eventDate, 10);
     if (date) {
@@ -97,12 +121,15 @@ export function leadMarkdown(lead: Lead): string {
     ["Name", lead.name],
     ["Email", lead.email],
     ["Phone", lead.phone],
+    ["Campaign", lead.campaign ? getCampaign(lead.campaign)?.name : undefined],
+    ["Pickup date", lead.pickupDate],
     ["Event date", lead.eventDate],
     ["Guests", lead.guests],
     ["Location", lead.location],
     ["Submitted from", lead.page],
   ];
   const lines = rows.filter(([, v]) => v !== undefined && v !== "").map(([k, v]) => `- **${k}:** ${v}`);
+  if (lead.items?.length) lines.push("", "**Cart at time of request**", "", ...lead.items.map((i) => `- ${i}`));
   if (lead.message) lines.push("", "**Message**", "", lead.message);
 
   const fmt = (t?: Touch) =>

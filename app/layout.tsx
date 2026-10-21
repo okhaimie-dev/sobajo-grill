@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
 import "./globals.css";
+import AnnouncementBar from "@/components/announcement-bar";
 import Analytics from "@/components/analytics";
 import { CartProvider } from "@/components/cart-context";
 import CartFab from "@/components/cart-fab";
@@ -37,6 +38,10 @@ export const metadata: Metadata = {
   // favicon + apple icon come from the app/ file conventions (base-path aware)
 };
 
+// Re-render hourly so date-based content (campaign announcement bar) switches
+// on and off without a redeploy.
+export const revalidate = 3600;
+
 export const viewport: Viewport = {
   themeColor: "#0a0706",
   colorScheme: "dark",
@@ -51,6 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <CartProvider>
+          <AnnouncementBar />
           <Nav />
           <main id="main">{children}</main>
           <Footer />

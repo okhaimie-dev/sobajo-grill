@@ -94,7 +94,9 @@ export default function Footer() {
       </div>
       <div className="container footer-bottom">
         <span>© {new Date().getFullYear()} Sobajo Grill. All rights reserved.</span>
-        <span>Sobajo means friend.</span>
+        <span>
+          <Link href="/privacy/">Privacy policy</Link> · Sobajo means friend.
+        </span>
       </div>
     </footer>
   );
