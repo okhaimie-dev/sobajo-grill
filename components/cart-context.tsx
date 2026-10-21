@@ -32,8 +32,10 @@ interface CartContextValue {
   count: number;
   subtotal: number;
   activeItem: MenuItem | null;
+  /** Size index the customizer opens on (a size tapped on the card). */
+  activeVariation: number;
   cartOpen: boolean;
-  configureItem: (item: MenuItem) => void;
+  configureItem: (item: MenuItem, variationIdx?: number) => void;
   closeItem: () => void;
   addConfiguredItem: (item: MenuItem, cfg: CartConfig) => void;
   removeItem: (id: number) => void;
@@ -57,6 +59,7 @@ const STORAGE_KEY = "sobajo-cart-v1";
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [activeItem, setActiveItem] = useState<MenuItem | null>(null);
+  const [activeVariation, setActiveVariation] = useState(0);
   const [cartOpen, setCartOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
@@ -93,8 +96,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const subtotal = useMemo(() => lines.reduce((sum, l) => sum + l.price, 0), [lines]);
 
-  const configureItem = useCallback((item: MenuItem) => {
+  const configureItem = useCallback((item: MenuItem, variationIdx = 0) => {
     setCartOpen(false);
+    setActiveVariation(variationIdx);
     setActiveItem(item);
     track("view_item", { items: [{ item_name: item.name, item_category: item.section }] });
   }, []);
@@ -158,6 +162,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       count,
       subtotal,
       activeItem,
+      activeVariation,
       cartOpen,
       configureItem,
       closeItem,
@@ -173,6 +178,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       count,
       subtotal,
       activeItem,
+      activeVariation,
       cartOpen,
       configureItem,
       closeItem,

@@ -17,7 +17,7 @@ import { useDialog } from "./use-dialog";
 type Spice = (typeof SPICE_OPTIONS)[number];
 
 export default function ItemModal() {
-  const { activeItem, closeItem, addConfiguredItem } = useCart();
+  const { activeItem, activeVariation, closeItem, addConfiguredItem } = useCart();
   const [variationIdx, setVariationIdx] = useState(0);
   const [spice, setSpice] = useState<Spice>("Medium");
   const [sideIdx, setSideIdx] = useState(0);
@@ -30,12 +30,12 @@ export default function ItemModal() {
   // Reset the form whenever a new item is being configured.
   useEffect(() => {
     if (!item) return;
-    setVariationIdx(0);
+    setVariationIdx(activeVariation);
     setSpice("Medium");
     setSideIdx(0);
     setQuantity(1);
     setNotes("");
-  }, [item]);
+  }, [item, activeVariation]);
 
   const spices = item ? hasSpiceOption(item) : false;
   const sides = item ? sideOptions(item) : [];

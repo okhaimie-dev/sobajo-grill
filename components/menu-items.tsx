@@ -51,11 +51,13 @@ export function FeatureDish({ item }: { item: MenuItem }) {
         {item.badge && <span className="chip">{item.badge}</span>}
         <h3>{item.name}</h3>
         <p className="dish-desc">{item.description}</p>
-        <ul className="size-list" aria-label="Sizes">
-          {item.variations.map(([name, p]) => (
+        <ul className="size-list" aria-label="Choose a size">
+          {item.variations.map(([name, p], idx) => (
             <li key={name}>
-              {name}
-              <strong>{price(p)}</strong>
+              <button type="button" onClick={() => configureItem(item, idx)} aria-label={`Add ${item.name}, ${name}, ${price(p)}`}>
+                {name}
+                <strong>{price(p)}</strong>
+              </button>
             </li>
           ))}
         </ul>
