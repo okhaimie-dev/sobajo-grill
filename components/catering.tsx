@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { asset } from "@/lib/assets";
-import { SITE } from "@/lib/site";
+import { CATERING_QUOTE_HREF } from "@/lib/site";
 import { Icon } from "./icons";
 
 const OCCASIONS = [
@@ -11,10 +12,6 @@ const OCCASIONS = [
   "Watch parties",
   "Community events",
 ];
-
-const QUOTE_HREF = `mailto:${SITE.email}?subject=${encodeURIComponent(
-  "Catering request"
-)}&body=${encodeURIComponent("Event date:\nGuest count:\nLocation:\nDishes I'm interested in:\n")}`;
 
 export default function Catering() {
   return (
@@ -35,10 +32,10 @@ export default function Catering() {
             ))}
           </ul>
           <div className="hero-actions">
-            <a className="btn btn-gold" href="#catering-menu">
-              Browse catering trays <Icon name="arrow" />
-            </a>
-            <a className="btn btn-ghost" href={QUOTE_HREF}>
+            <Link className="btn btn-gold" href="/catering/">
+              Explore catering <Icon name="arrow" />
+            </Link>
+            <a className="btn btn-ghost" href={CATERING_QUOTE_HREF}>
               <Icon name="mail" /> Request a quote
             </a>
           </div>

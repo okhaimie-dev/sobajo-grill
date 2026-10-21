@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { CartLine, money } from "@/lib/menu";
 import { DELIVERY_FEE, DELIVERY_MINIMUM, useCart } from "./cart-context";
@@ -64,9 +65,9 @@ export default function CartModal() {
               <strong>Your cart is empty</strong>
               Add a dish from the menu to get started.
               <div>
-                <a className="btn btn-primary" href="#menu" onClick={closeCart}>
+                <Link className="btn btn-primary" href="/menu/" onClick={closeCart}>
                   Browse the menu
-                </a>
+                </Link>
               </div>
             </div>
           ) : (

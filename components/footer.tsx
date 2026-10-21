@@ -1,15 +1,16 @@
+import Link from "next/link";
 import { asset } from "@/lib/assets";
 import { SITE } from "@/lib/site";
 import { Icon } from "./icons";
 
 const EXPLORE_LINKS = [
-  { href: "#menu", label: "Full menu" },
-  { href: "#ndokoti", label: "Ndokoti platters" },
-  { href: "#catering", label: "Catering" },
-  { href: "#delivery", label: "Delivery" },
-  { href: "#shipping", label: "Nationwide shipping" },
-  { href: "#story", label: "Our story" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/menu/", label: "Full menu" },
+  { href: "/menu/#ndokoti", label: "Ndokoti platters" },
+  { href: "/catering/", label: "Catering" },
+  { href: "/#delivery", label: "Delivery" },
+  { href: "/#shipping", label: "Nationwide shipping" },
+  { href: "/#story", label: "Our story" },
+  { href: "/#faq", label: "FAQ" },
 ];
 
 export default function Footer() {
@@ -49,7 +50,7 @@ export default function Footer() {
           <ul>
             {EXPLORE_LINKS.map((l) => (
               <li key={l.href}>
-                <a href={l.href}>{l.label}</a>
+                <Link href={l.href}>{l.label}</Link>
               </li>
             ))}
           </ul>

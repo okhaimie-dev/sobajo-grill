@@ -15,9 +15,9 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? `https://okhaimie-dev.github.io${BASE_PATH}`
 ).replace(/\/$/, "");
 
-/** Absolute URL for a root-relative path ("/hero.jpg"). */
+/** Absolute URL for a root-relative path ("/hero.jpg", "/menu/"). */
 export function absoluteUrl(path = "/"): string {
-  return SITE_URL + (path === "/" ? "/" : path);
+  return SITE_URL + (path.startsWith("/") ? path : `/${path}`);
 }
 
 export const SITE = {
@@ -64,3 +64,8 @@ export const SITE = {
    */
   hours: [] as { days: string[]; opens: string; closes: string }[],
 };
+
+/** Pre-filled catering quote email (used by the catering teaser + page). */
+export const CATERING_QUOTE_HREF = `mailto:${SITE.email}?subject=${encodeURIComponent(
+  "Catering request"
+)}&body=${encodeURIComponent("Event date:\nGuest count:\nLocation:\nDishes I'm interested in:\n")}`;

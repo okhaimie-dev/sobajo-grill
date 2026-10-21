@@ -16,6 +16,8 @@ const nextConfig: NextConfig = {
   // this page is a static prerender + client hydration anyway.
   output: "export",
   basePath,
+  // /menu → out/menu/index.html, which every static host (incl. Pages) serves.
+  trailingSlash: true,
 };
 
 export default nextConfig;

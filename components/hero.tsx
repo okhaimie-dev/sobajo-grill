@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { asset } from "@/lib/assets";
 import { SITE } from "@/lib/site";
 import { Icon, Stars } from "./icons";
@@ -28,12 +29,12 @@ export default function Hero() {
           plantains — West African heritage meets American barbecue, right here in Baltimore.
         </p>
         <div className="hero-actions">
-          <a className="btn btn-primary" href="#menu">
+          <Link className="btn btn-primary" href="/menu/">
             Start your order <Icon name="arrow" />
-          </a>
-          <a className="btn btn-ghost" href="#catering">
+          </Link>
+          <Link className="btn btn-ghost" href="/catering/">
             Book catering
-          </a>
+          </Link>
         </div>
         <div className="hero-meta">
           <span>

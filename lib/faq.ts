@@ -35,3 +35,31 @@ export const FAQS: { q: string; a: string }[] = [
     a: "Sobajo means friend. Sobajo Grill was born in Baltimore from the heritage of a Cameroonian father and a Nigerian mother — come as a customer, leave as a friend.",
   },
 ];
+
+/** Catering page FAQ (rendered + FAQPage JSON-LD on /catering/). */
+export const CATERING_FAQS: { q: string; a: string }[] = [
+  {
+    q: "How much notice do you need for catering?",
+    a: "24 hours' notice is preferred so every tray comes off the fire fresh. For large events, reach out as early as you can and we'll plan it with you.",
+  },
+  {
+    q: "What tray sizes do you offer?",
+    a: "Catering trays come in half and full pans, each in shallow or deep — Half Shallow, Half Deep, Full Shallow and Full Deep. Prices for every size are listed on this page.",
+  },
+  {
+    q: "Do you deliver catering orders?",
+    a: `Yes. A dedicated Sobajo driver delivers up to 20 miles. Delivery orders have a $${DELIVERY_MINIMUM} minimum and a $${DELIVERY_FEE} delivery fee. Pickup is available at ${SITE.address.street}, ${SITE.address.city}.`,
+  },
+  {
+    q: "Can I choose the spice level for catering trays?",
+    a: "Yes — trays can be made Mild, Medium, Hot or Extra Hot, so the whole crowd is covered. Fire-Grilled Fish trays are made without suya spice.",
+  },
+  {
+    q: "What events do you cater?",
+    a: "Offices, churches, birthdays, graduations, weddings, watch parties and community events — anywhere people gather around good food.",
+  },
+  {
+    q: "How do I get a quote for a large event?",
+    a: `Email ${SITE.email} or call ${SITE.phone} with your date, guest count and location, and we'll put together a spread for you.`,
+  },
+];

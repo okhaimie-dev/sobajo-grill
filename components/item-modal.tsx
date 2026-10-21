@@ -11,7 +11,7 @@ import {
 } from "@/lib/menu";
 import { useCart } from "./cart-context";
 import { Icon } from "./icons";
-import { itemImageProps } from "./menu-sections";
+import { itemImageProps } from "./menu-items";
 import { useDialog } from "./use-dialog";
 
 type Spice = (typeof SPICE_OPTIONS)[number];

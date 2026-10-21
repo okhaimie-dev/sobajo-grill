@@ -27,40 +27,55 @@ https://okhaimie-dev.github.io/sobajo-grill/
 
 ## What's included
 
-- **Sections** — Hero, Signature Experiences, Full Menu (sticky scroll-synced
-  category bar), Catering, Delivery, Our Story, Reviews, Shipping ("coming
-  soon" + waitlist), FAQ, CTA, Footer.
-- **Menu data** — all 29 items in `lib/menu.ts`; each section picks a layout
-  (`feature` · `cards` · `tiers` · `list`).
-- **Ordering** — native `<dialog>` item customizer (size/spice/side chips,
-  quantity stepper, live price) and cart sheet (pickup/delivery toggle, $100
-  delivery minimum with progress, inline validation) → Square checkout. Cart
+- **Pages**
+  - `/` — brand landing: hero, signature experiences, signature dishes
+    (teaser → full menu), catering teaser, delivery, story, reviews, shipping,
+    FAQ.
+  - `/menu/` — full menu with a sticky scroll-synced category bar; each
+    section picks a layout (`feature` · `cards` · `tiers` · `list`) in
+    `lib/menu.ts`.
+  - `/catering/` — campaign landing page: occasions, tray × pan-size pricing
+    matrix, Ndokoti platters, how it works, catering FAQ, quote CTAs.
+- **Ordering** — native `<dialog>` item customizer and cart sheet (pickup /
+  delivery, $100 minimum progress, inline validation) → Square checkout. The
+  cart lives in the root layout, so it follows the guest across pages, and
   persists in `localStorage`.
-- **SEO** — page metadata, canonical, Open Graph/Twitter card (`/og.png`,
-  generated at build), `sitemap.xml`, `robots.txt`, web manifest, and
-  schema.org JSON-LD (`Restaurant` + full `Menu` with prices, `WebSite`,
-  `FAQPage`).
+- **SEO** — per-page title/description/canonical/Open Graph via
+  `lib/seo.ts → pageMetadata`; shared `/og.png` share card; `sitemap.xml`
+  (all pages), `robots.txt`, manifest. JSON-LD: `Restaurant` + `WebSite`
+  site-wide, `FAQPage` on home, `Menu` on /menu/, `Service` + `FAQPage` on
+  /catering/, `BreadcrumbList` on sub-pages.
+
+> Internal links must use `next/link` (`<Link href="/menu/">`) — it adds the
+> GitHub Pages base path; a plain `<a href="/menu/">` would 404 there.
 
 ## Structure
 
 ```
 app/
-  layout.tsx          # fonts, metadata, viewport, JSON-LD
-  page.tsx            # section assembly
+  layout.tsx          # fonts, site-wide metadata + Restaurant JSON-LD, nav/footer/cart shell
+  page.tsx            # home
+  menu/page.tsx       # full menu
+  catering/page.tsx   # catering landing page
   globals.css         # design tokens + all component styles
   og.png/route.tsx    # 1200×630 social share card (build-time ImageResponse)
   sitemap.ts robots.ts manifest.ts icon.png apple-icon.png
 components/
   cart-context.tsx    # cart state, pricing rules, checkout validation (client)
-  use-dialog.ts       # React state ↔ native <dialog>
-  icons.tsx           # inline SVG icon set
-  nav hero marquee experiences menu-sections catering delivery story
-  reviews shipping faq cta footer item-modal cart-modal cart-fab
+  menu-items.tsx      # DishCard, FeatureDish, Tiers, ListRows (shared)
+  menu-sections.tsx   # /menu/ body + scroll-spy tabs
+  menu-highlights.tsx # home-page menu teaser
+  catering-trays.tsx  # tray pricing matrix
+  page-hero.tsx       # sub-page hero + breadcrumbs
+  faq.tsx json-ld.tsx use-dialog.ts icons.tsx
+  nav hero marquee experiences catering delivery story reviews shipping
+  cta footer item-modal cart-modal cart-fab
 lib/
   site.ts             # business facts: name, address, phone, socials, hours, SITE_URL
+  seo.ts              # pageMetadata() + shared OG image
   menu.ts             # items, variations, prices, delivery rules
-  faq.ts              # FAQ copy (rendered + FAQPage JSON-LD)
-  structured-data.ts  # schema.org JSON-LD builder
+  faq.ts              # home + catering FAQ copy (rendered + JSON-LD)
+  structured-data.ts  # schema.org JSON-LD builders
 ```
 
 ## Before going live

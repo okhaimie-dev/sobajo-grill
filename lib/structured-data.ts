@@ -1,14 +1,14 @@
 /**
- * schema.org JSON-LD for the home page: Restaurant (with full Menu and
- * offers), WebSite and FAQPage, linked through @id so Google reads them as
- * one entity graph.
+ * schema.org JSON-LD builders. The Restaurant entity is emitted site-wide by
+ * the root layout; each page adds its own nodes (Menu, FAQPage, Service,
+ * BreadcrumbList) that point back to it through @id.
  */
 
-import { FAQS } from "./faq";
-import { MENU_SECTIONS, MenuItem } from "./menu";
+import { MENU_SECTIONS, MenuItem, MenuSection } from "./menu";
 import { SITE, absoluteUrl } from "./site";
 
-const RESTAURANT_ID = absoluteUrl("/#restaurant");
+export const RESTAURANT_ID = absoluteUrl("/#restaurant");
+const MENU_ID = absoluteUrl("/menu/#menu");
 
 function itemImage(item: MenuItem): string | undefined {
   if (!item.image) return undefined;
@@ -34,7 +34,16 @@ function menuItem(item: MenuItem) {
   };
 }
 
-export function buildJsonLd() {
+function menuSection(s: MenuSection) {
+  return {
+    "@type": "MenuSection",
+    name: s.title,
+    description: s.note,
+    hasMenuItem: s.items.map(menuItem),
+  };
+}
+
+export function restaurantJsonLd() {
   const { address } = SITE;
   return {
     "@context": "https://schema.org",
@@ -72,20 +81,10 @@ export function buildJsonLd() {
             closes: h.closes,
           })),
         }),
-        hasMenu: {
-          "@type": "Menu",
-          name: `${SITE.name} Menu`,
-          url: absoluteUrl("/#menu"),
-          hasMenuSection: MENU_SECTIONS.map((s) => ({
-            "@type": "MenuSection",
-            name: s.title,
-            description: s.note,
-            hasMenuItem: s.items.map(menuItem),
-          })),
-        },
+        hasMenu: absoluteUrl("/menu/"),
         potentialAction: {
           "@type": "OrderAction",
-          target: absoluteUrl("/#menu"),
+          target: absoluteUrl("/menu/"),
           deliveryMethod: [
             "http://purl.org/goodrelations/v1#DeliveryModePickUp",
             "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet",
@@ -99,16 +98,68 @@ export function buildJsonLd() {
         name: SITE.name,
         publisher: { "@id": RESTAURANT_ID },
       },
-      {
-        "@type": "FAQPage",
-        "@id": absoluteUrl("/#faq"),
-        mainEntity: FAQS.map((f) => ({
-          "@type": "Question",
-          name: f.q,
-          acceptedAnswer: { "@type": "Answer", text: f.a },
-        })),
-      },
     ],
+  };
+}
+
+/** Full Menu (every section, item and priced size) for /menu/. */
+export function menuJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Menu",
+    "@id": MENU_ID,
+    name: `${SITE.name} Menu`,
+    url: absoluteUrl("/menu/"),
+    inLanguage: "en-US",
+    mainEntityOfPage: absoluteUrl("/menu/"),
+    provider: { "@id": RESTAURANT_ID },
+    hasMenuSection: MENU_SECTIONS.map(menuSection),
+  };
+}
+
+export function cateringServiceJsonLd(trays: MenuSection) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": absoluteUrl("/catering/#service"),
+    serviceType: "Catering",
+    name: `${SITE.name} Catering`,
+    description:
+      "African barbecue and suya catering in Baltimore — half and full pans of brisket suya, fire-grilled chicken, wings, turkey wings and grilled fish, delivered by a dedicated Sobajo driver.",
+    url: absoluteUrl("/catering/"),
+    provider: { "@id": RESTAURANT_ID },
+    areaServed: { "@type": "City", name: "Baltimore" },
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Catering trays",
+      itemListElement: trays.items.map(menuItem),
+    },
+  };
+}
+
+export function faqJsonLd(faqs: { q: string; a: string }[], path: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": absoluteUrl(`${path}#faq`),
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+}
+
+export function breadcrumbJsonLd(crumbs: { name: string; path: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.name,
+      item: absoluteUrl(c.path),
+    })),
   };
 }
 
