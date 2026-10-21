@@ -21,9 +21,7 @@ button,input,select,textarea{font:inherit}
 .gold{background:var(--gold);color:#111}
 .dark{background:#202020;color:#fff;border:1px solid var(--line)}
 
-.hero{min-height:78vh;display:grid;align-items:center;background:
-linear-gradient(90deg,rgba(0,0,0,.94),rgba(0,0,0,.62)),
-url('/hero.jpg') center/cover}
+.hero{min-height:78vh;display:grid;align-items:center;background:linear-gradient(90deg,rgba(0,0,0,.94),rgba(0,0,0,.62))}
 .hero-content{padding:84px 0;max-width:760px}
 .eyebrow{color:var(--gold);font-size:.84rem;text-transform:uppercase;font-weight:900;letter-spacing:.16em}
 .hero h1{margin:14px 0 18px;font-size:clamp(3.2rem,8vw,6.8rem);line-height:.92;letter-spacing:-.05em}

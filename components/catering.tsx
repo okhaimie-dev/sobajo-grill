@@ -1,3 +1,5 @@
+import { asset } from "@/lib/assets";
+
 export default function Catering() {
   return (
     <section className="feature" id="catering">
@@ -17,7 +19,7 @@ export default function Catering() {
             </a>
           </div>
         </div>
-        <img src="/catering.jpg" alt="Catering spread" />
+        <img src={asset("/catering.jpg")} alt="Catering spread" />
       </div>
     </section>
   );

@@ -1,3 +1,5 @@
+import { asset } from "@/lib/assets";
+
 const EXPLORE_LINKS = [
   { href: "#menu", label: "Menu" },
   { href: "#delivery", label: "Delivery" },
@@ -12,7 +14,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="container footer-grid">
         <div>
-          <img src="/logo.png" alt="Sobajo Grill logo" className="footer-logo" />
+          <img src={asset("/logo.png")} alt="Sobajo Grill logo" className="footer-logo" />
           <p>Friendship • Heritage • Flavor • Community</p>
           <p>
             7108 Liberty Road

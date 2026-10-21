@@ -1,8 +1,10 @@
+import { asset } from "@/lib/assets";
+
 export default function Story() {
   return (
     <section id="story">
       <div className="container story-grid">
-        <img src="/story.jpg" alt="Food gathering" />
+        <img src={asset("/story.jpg")} alt="Food gathering" />
         <div>
           <div className="eyebrow">Our Story</div>
           <h2

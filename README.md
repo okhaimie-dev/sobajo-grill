@@ -12,6 +12,19 @@ npm run dev     # http://localhost:3000
 npm run build && npm run start   # production
 ```
 
+## Deploying to GitHub Pages
+
+The site exports fully statically (`output: "export"`) and deploys from
+`main` via `.github/workflows/deploy.yml`:
+
+https://okhaimie-dev.github.io/sobajo-grill/
+
+- CI bakes asset links under the repo sub-path with
+  `NEXT_PUBLIC_BASE_PATH=/sobajo-grill` (see `next.config.ts` and
+  `lib/assets.ts`). Any other sub-path host can reuse the same env var.
+- Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**
+  is selected automatically by this workflow's first run.
+
 ## What's included
 
 Same look & behavior as the demo HTML, rebuilt with React components:

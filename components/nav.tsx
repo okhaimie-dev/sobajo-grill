@@ -1,5 +1,6 @@
 "use client";
 
+import { asset } from "@/lib/assets";
 import { useCart } from "./cart-context";
 
 const NAV_LINKS = [
@@ -19,7 +20,7 @@ export default function Nav() {
     <nav className="nav">
       <div className="container nav-inner">
         <a href="#top" aria-label="Sobajo Grill — back to top">
-          <img src="/logo.png" alt="Sobajo Grill logo" className="logo" />
+          <img src={asset("/logo.png")} alt="Sobajo Grill logo" className="logo" />
         </a>
         <div className="nav-links">
           {NAV_LINKS.map((l) => (

@@ -1,6 +1,18 @@
+import { asset } from "@/lib/assets";
+
 export default function Hero() {
   return (
-    <header className="hero" id="top">
+    <header
+      className="hero"
+      id="top"
+      style={{
+        backgroundImage: `linear-gradient(90deg,rgba(0,0,0,.94),rgba(0,0,0,.62)),url('${asset(
+          "/hero.jpg"
+        )}')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="container hero-content">
         <div className="eyebrow">Baltimore Suya Delicacies</div>
         <h1>
