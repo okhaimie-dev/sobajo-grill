@@ -8,15 +8,35 @@ import { useGooglePlace } from "./use-google-place";
 const EMBED_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
 const PLACE_ID = process.env.NEXT_PUBLIC_GOOGLE_PLACE_ID;
 
-/** Maps Embed API (free, unlimited). Exact pin with a place ID, else a name + address search. */
-function embedSrc(): string | null {
-  if (!EMBED_KEY) return null;
+/**
+ * Map iframe. With an Embed API key (needs a Google Cloud billing account,
+ * though the API itself is free) we use the official Embed API. Without one
+ * we use Google Maps' keyless embed — no account, no card — which still
+ * shows the live business card (rating + review count) and directions.
+ */
+function embedSrc(): string {
   const { street, city, region, postalCode } = SITE.address;
-  const q = PLACE_ID ? `place_id:${PLACE_ID}` : `${SITE.name}, ${street}, ${city}, ${region} ${postalCode}`;
+  const query = `${SITE.name}, ${street}, ${city}, ${region} ${postalCode}`;
+  if (!EMBED_KEY) return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+  const q = PLACE_ID ? `place_id:${PLACE_ID}` : query;
   return `https://www.google.com/maps/embed/v1/place?key=${EMBED_KEY}&q=${encodeURIComponent(q)}`;
 }
 
 const DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+const to12h = (t: string) => {
+  const [h, m] = t.split(":").map(Number);
+  return `${((h + 11) % 12) + 1}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+};
+
+/** Weekly lines ("Monday: 12:00 PM – 8:00 PM") from the hand-entered SITE.hours. */
+function siteHours(): string[] {
+  if (!SITE.hours.length) return [];
+  return DAY_ORDER.map((day) => {
+    const slots = SITE.hours.filter((h) => h.days.includes(day));
+    return `${day}: ${slots.length ? slots.map((h) => `${to12h(h.opens)} – ${to12h(h.closes)}`).join(", ") : "Closed"}`;
+  });
+}
 
 export default function Visit() {
   const ref = useRef<HTMLElement>(null);
@@ -25,6 +45,8 @@ export default function Visit() {
   const src = embedSrc();
   const { address } = SITE;
   const today = DAY_ORDER[(new Date().getDay() + 6) % 7];
+  // Live Google hours when the Places API is on; otherwise the hours entered in lib/site.ts.
+  const hours = place?.hours.length ? place.hours : siteHours();
 
   return (
     <section className="section" id="visit" aria-labelledby="visit-title" ref={ref}>
@@ -54,10 +76,10 @@ export default function Visit() {
                 </span>
               )}
             </div>
-            {place?.hours.length ? (
+            {hours.length ? (
               <>
                 <ul>
-                  {place.hours.map((line) => {
+                  {hours.map((line) => {
                     const [day, ...rest] = line.split(": ");
                     return (
                       <li key={day} className={day === today ? "today" : undefined}>
@@ -67,7 +89,7 @@ export default function Visit() {
                     );
                   })}
                 </ul>
-                <small className="google-attribution">Hours from Google Maps</small>
+                {place?.hours.length ? <small className="google-attribution">Hours from Google Maps</small> : null}
               </>
             ) : (
               <p className="visit-muted">
@@ -92,23 +114,13 @@ export default function Visit() {
         </div>
 
         <div className="visit-map">
-          {src ? (
-            <iframe
-              src={src}
-              title={`Map showing ${SITE.name} at ${address.street}, ${address.city}`}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
-            />
-          ) : (
-            <a className="map-placeholder" href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
-              <Icon name="pin" />
-              <strong>
-                {address.street}, {address.city}
-              </strong>
-              <span>Open in Google Maps</span>
-            </a>
-          )}
+          <iframe
+            src={src}
+            title={`Map showing ${SITE.name} at ${address.street}, ${address.city}`}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+          />
         </div>
       </div>
     </section>

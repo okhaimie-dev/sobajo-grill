@@ -62,6 +62,11 @@ export const SITE = {
     tiktok: { handle: "@sobajogrill", url: "https://www.tiktok.com/@sobajogrill" },
   },
   cashAppUrl: "https://cash.app/$sobajogrillmd",
+  /**
+   * Free "leave us a review" short link — Google Business Profile → "Ask for
+   * reviews" (looks like https://g.page/r/…/review). TODO: paste it here.
+   */
+  googleReviewUrl: null as string | null,
   /** DoorDash store page — TODO: paste the listing URL; "Order on DoorDash" buttons appear once set. */
   doordashUrl: null as string | null,
   priceRange: "$$",
@@ -73,8 +78,10 @@ export const SITE = {
   googleRating: 4.9,
   cuisines: ["Nigerian", "Cameroonian", "West African", "Barbecue", "Suya"],
   /**
-   * TODO: fill in real hours — they feed Google rich results ("Open now").
-   * Format: schema.org days + 24h "HH:MM". Left empty so nothing is invented.
+   * TODO: fill in real hours — shown in "Visit us" and fed to Google via
+   * JSON-LD. Days are full English names; times 24h "HH:MM". Example:
+   *   { days: ["Wednesday", "Thursday"], opens: "12:00", closes: "20:00" }
+   * Left empty so nothing is invented.
    */
   hours: [] as { days: string[]; opens: string; closes: string }[],
 };

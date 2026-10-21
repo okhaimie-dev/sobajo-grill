@@ -123,11 +123,18 @@ export default function Reviews() {
           </div>
         )}
         {!place && (
-          <p className="google-attribution" style={{ marginTop: 18 }}>
-            <a href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
-              Read more reviews on Google Maps
-            </a>
-          </p>
+          <div className="reviews-foot">
+            <p className="google-attribution">
+              <a href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
+                Read more reviews on Google Maps
+              </a>
+            </p>
+            {SITE.googleReviewUrl && (
+              <a className="btn btn-gold btn-sm" href={SITE.googleReviewUrl} target="_blank" rel="noopener noreferrer">
+                <Icon name="star" /> Leave us a review
+              </a>
+            )}
+          </div>
         )}
       </div>
     </section>
