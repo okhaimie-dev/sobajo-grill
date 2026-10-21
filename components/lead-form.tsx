@@ -1,12 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { track } from "@/lib/analytics";
 import { getAttribution } from "@/lib/attribution";
 import type { LeadKind } from "@/lib/leads/schema";
 import { BASE_PATH } from "@/lib/assets";
+import { money } from "@/lib/menu";
 import { CATERING_QUOTE_HREF, SITE } from "@/lib/site";
+import { useCart } from "./cart-context";
 import { Icon } from "./icons";
 
 const COPY: Record<LeadKind, { button: string; done: string; doneText: string }> = {
@@ -14,6 +17,11 @@ const COPY: Record<LeadKind, { button: string; done: string; doneText: string }>
     button: "Send my request",
     done: "Request received!",
     doneText: "Thank you — we'll reach out shortly to plan your spread.",
+  },
+  preorder: {
+    button: "Send my pre-order request",
+    done: "Pre-order request received!",
+    doneText: "We'll call or text to confirm your order, pickup time and payment.",
   },
   waitlist: {
     button: "Join the shipping list",
@@ -30,8 +38,24 @@ const COPY: Record<LeadKind, { button: string; done: string; doneText: string }>
 const today = () => new Date().toISOString().slice(0, 10);
 
 /** Lead capture → POST /api/leads → CRM. Falls back to email if the API is unavailable. */
-export default function LeadForm({ kind, compact = false }: { kind: LeadKind; compact?: boolean }) {
+export default function LeadForm({
+  kind,
+  compact = false,
+  campaign,
+  maxDate,
+}: {
+  kind: LeadKind;
+  compact?: boolean;
+  /** Campaign slug (pre-orders). */
+  campaign?: string;
+  /** Latest selectable pickup date (YYYY-MM-DD). */
+  maxDate?: string;
+}) {
   const pathname = usePathname();
+  const { lines, clearCart } = useCart();
+  const cartItems = lines.map(
+    (l) => `${l.name} — ${[l.variation, l.quantity > 1 ? `× ${l.quantity}` : "", l.spice, l.side, l.notes].filter(Boolean).join(" · ")} (${money(l.price)})`
+  );
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
   const copy = COPY[kind];
@@ -46,12 +70,20 @@ export default function LeadForm({ kind, compact = false }: { kind: LeadKind; co
       const res = await fetch(`${BASE_PATH}/api/leads/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, kind, page: pathname, attribution: getAttribution() }),
+        body: JSON.stringify({
+          ...data,
+          kind,
+          campaign,
+          ...(kind === "preorder" && { items: cartItems }),
+          page: pathname,
+          attribution: getAttribution(),
+        }),
       });
       const body = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(body.error ?? "Something went wrong.");
       setStatus("done");
-      track(kind === "newsletter" ? "sign_up" : "generate_lead", { lead_type: kind, method: "website_form" });
+      track(kind === "newsletter" ? "sign_up" : "generate_lead", { lead_type: kind, campaign, method: "website_form" });
+      if (kind === "preorder" && cartItems.length) clearCart();
       form.reset();
     } catch (err) {
       setStatus("error");
@@ -82,7 +114,48 @@ export default function LeadForm({ kind, compact = false }: { kind: LeadKind; co
         </label>
       </div>
 
-      {kind === "catering" ? (
+      {kind === "preorder" ? (
+        <div className="lead-grid">
+          <label className="field">
+            <span className="field-label">Name *</span>
+            <input className="input" name="name" required autoComplete="name" />
+          </label>
+          <label className="field">
+            <span className="field-label">Phone *</span>
+            <input className="input" name="phone" type="tel" required autoComplete="tel" placeholder="(443) 555-0123" />
+          </label>
+          <label className="field lead-wide">
+            <span className="field-label">Email *</span>
+            <input className="input" name="email" type="email" required autoComplete="email" />
+          </label>
+          <label className="field">
+            <span className="field-label">Preferred pickup date</span>
+            <input className="input" name="pickupDate" type="date" min={today()} max={maxDate} />
+          </label>
+          <label className="field">
+            <span className="field-label">Guests</span>
+            <input className="input" name="guests" type="number" min={1} max={10000} inputMode="numeric" />
+          </label>
+          <div className="field lead-wide">
+            <span className="field-label">Your order</span>
+            {cartItems.length ? (
+              <ul className="lead-cart">
+                {cartItems.map((i) => (
+                  <li key={i}>{i}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="lead-cart-empty">
+                Add dishes above and they&apos;ll appear here — or just tell us what you&apos;d like below.
+              </p>
+            )}
+          </div>
+          <label className="field lead-wide">
+            <span className="field-label">Anything else?</span>
+            <textarea className="input" name="message" rows={3} placeholder="Extra dishes, spice preferences, pickup or DoorDash delivery…" />
+          </label>
+        </div>
+      ) : kind === "catering" ? (
         <div className="lead-grid">
           <label className="field">
             <span className="field-label">Name *</span>
@@ -134,8 +207,14 @@ export default function LeadForm({ kind, compact = false }: { kind: LeadKind; co
           {status === "sending" ? "Sending…" : copy.button}
           {status !== "sending" && <Icon name="arrow" />}
         </button>
-        {kind !== "catering" && (
-          <p className="lead-fine">We&apos;ll only email about Sobajo. Unsubscribe anytime.</p>
+        {kind === "waitlist" || kind === "newsletter" ? (
+          <p className="lead-fine">
+            We&apos;ll only email about Sobajo. Unsubscribe anytime. <Link href="/privacy/">Privacy policy</Link>
+          </p>
+        ) : (
+          <p className="lead-fine">
+            No payment now — we&apos;ll confirm with you first. <Link href="/privacy/">Privacy policy</Link>
+          </p>
         )}
       </div>
     </form>

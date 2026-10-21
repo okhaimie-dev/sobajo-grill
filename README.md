@@ -76,6 +76,18 @@ branch gets its own preview URL.
   `lib/reviews.ts`. Paste real Google reviews there (author, rating, link);
   only entries with a Google link are labeled "Google review".
 
+- **Campaigns** — each entry in `lib/campaigns.ts` becomes a landing page at
+  `/<slug>/` (own SEO title, share image `/<slug>/og.png`, sitemap entry,
+  FAQ JSON-LD) plus a site-wide announcement bar during its banner window.
+  Featured dishes are referenced by menu name (prices stay in sync; a typo
+  fails the build). Pages carry a **pre-order request** form → `/api/leads`
+  (kind `preorder`) → CRM Opportunity with the guest's cart. Pages
+  re-render hourly, so the bar switches on/off by date without a deploy.
+  Launch ads with tagged links, e.g.
+  `/thanksgiving/?utm_source=instagram&utm_medium=paid_social&utm_campaign=thanksgiving-2026`.
+- **Privacy policy** — `/privacy/`, linked from the footer and every form.
+  Update it when a new tool is added; have the owner review it.
+
 Configuration lives in environment variables — see `.env.example`. With no
 CRM or webhook configured, production refuses lead submissions (503) and the
 forms offer an email fallback rather than silently dropping leads.
@@ -88,6 +100,8 @@ app/
   page.tsx            # home
   menu/page.tsx       # full menu
   catering/page.tsx   # catering landing page
+  [campaign]/         # campaign landing pages + per-campaign og.png (from lib/campaigns.ts)
+  privacy/page.tsx    # privacy policy
   globals.css         # design tokens + all component styles
   og.png/route.tsx    # 1200×630 social share card (build-time ImageResponse)
   sitemap.ts robots.ts manifest.ts icon.png apple-icon.png
@@ -109,6 +123,8 @@ lib/
   analytics.ts        # track() → GA4 + Meta Pixel
   site.ts             # business facts: name, address, phone, socials, hours, SITE_URL
   seo.ts              # pageMetadata() + shared OG image
+  campaigns.ts        # marketing campaigns (Thanksgiving…)
+  og.tsx              # share-card renderer
   menu.ts             # items, variations, prices, delivery rules
   faq.ts              # home + catering FAQ copy (rendered + JSON-LD)
   structured-data.ts  # schema.org JSON-LD builders

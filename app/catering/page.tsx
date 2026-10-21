@@ -185,7 +185,7 @@ export default function CateringPage() {
               .
             </p>
           </div>
-          <div className="quote-card">
+          <div className="quote-card" data-hide-fab>
             <LeadForm kind="catering" />
           </div>
         </div>

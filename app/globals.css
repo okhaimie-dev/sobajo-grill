@@ -300,6 +300,40 @@ p { margin: 0; text-wrap: pretty; }
 .price-table .add-btn::after { content: none; }
 .steps.steps-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 0; }
 
+/* ---------- campaigns ---------- */
+.announce {
+  position: relative; z-index: 61; display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 9px var(--gutter); text-align: center; font-size: 0.9rem; font-weight: 600; color: #15100b;
+  background: linear-gradient(90deg, var(--gold), var(--gold-soft) 50%, var(--gold));
+}
+.announce svg { width: 16px; height: 16px; flex: none; }
+.announce > svg { color: var(--red-btn); }
+.announce-cta { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.announce:hover .announce-cta svg { transform: translateX(2px); }
+.announce-short { display: none; }
+.reason-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.campaign-sides { max-width: 640px; margin-top: 40px; }
+.campaign-sides h3 { font-size: 1.5rem; margin-bottom: 14px; }
+.key-dates { display: grid; gap: 10px; margin: 28px 0 0; }
+.key-dates > div { display: grid; grid-template-columns: 130px 1fr; gap: 12px; padding: 14px 16px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); }
+.key-dates dt { color: var(--muted); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; padding-top: 2px; }
+.key-dates dd { margin: 0; font-weight: 700; }
+.lead-cart { margin: 0; padding: 12px 14px 12px 32px; border-radius: var(--r-sm); background: var(--surface-2); border: 1px solid var(--line); display: grid; gap: 4px; font-size: 0.9rem; }
+.lead-cart-empty { color: var(--muted); font-size: 0.9rem; padding: 12px 14px; border-radius: var(--r-sm); border: 1px dashed var(--line-strong); }
+.lead-fine a { text-decoration: underline; text-underline-offset: 3px; }
+.footer-bottom a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- prose (privacy policy) ---------- */
+.prose { max-width: 760px; }
+.prose h2 { font-size: 1.5rem; margin: 40px 0 12px; }
+.prose h2:first-child { margin-top: 0; }
+.prose p, .prose li { color: var(--text-2); }
+.prose p + p { margin-top: 12px; }
+.prose ul { padding-left: 20px; display: grid; gap: 10px; margin: 0; }
+.prose a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+.prose code { font-size: 0.88em; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); }
+.prose-back { margin-top: 40px; }
+
 /* ---------- lead forms ---------- */
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .lead-form { display: grid; gap: 16px; }
@@ -928,6 +962,10 @@ input[type="datetime-local"].input { color-scheme: dark; }
   .stat svg { margin-bottom: 12px; }
   .values { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lead-grid { grid-template-columns: 1fr; }
+  .reason-grid { grid-template-columns: 1fr; }
+  .key-dates > div { grid-template-columns: 1fr; gap: 2px; }
+  .announce-long { display: none; }
+  .announce-short { display: inline; }
   .lead-form.compact .lead-actions { flex-direction: column; align-items: stretch; }
   .lead-form .btn { width: 100%; }
   .footer-grid { grid-template-columns: 1fr; gap: 32px; }

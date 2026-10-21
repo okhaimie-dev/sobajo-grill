@@ -16,12 +16,15 @@ export function pageMetadata({
   title,
   description,
   path,
+  image = OG_IMAGE,
 }: {
   /** Omit on the home page to use the default brand title. */
   title?: string;
   description: string;
   /** Route with trailing slash, e.g. "/menu/". */
   path: string;
+  /** Share image; defaults to the site card. */
+  image?: typeof OG_IMAGE;
 }): Metadata {
   const url = absoluteUrl(path);
   const fullTitle = title ? `${title} | ${SITE.name}` : SITE.title;
@@ -36,8 +39,8 @@ export function pageMetadata({
       siteName: SITE.name,
       title: fullTitle,
       description,
-      images: [OG_IMAGE],
+      images: [image],
     },
-    twitter: { card: "summary_large_image", title: fullTitle, description, images: [OG_IMAGE] },
+    twitter: { card: "summary_large_image", title: fullTitle, description, images: [image] },
   };
 }
