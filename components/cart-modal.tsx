@@ -34,6 +34,16 @@ export default function CartModal() {
   const [orderTime, setOrderTime] = useState("");
   const [address, setAddress] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  const submit = async () => {
+    setPending(true);
+    setError(null);
+    const err = await checkout({ isDelivery, address, time: orderTime });
+    setError(err);
+    // On success the page is navigating to Square; keep the button disabled.
+    if (err) setPending(false);
+  };
 
   const ref = useDialog(cartOpen, closeCart);
 
@@ -160,8 +170,8 @@ export default function CartModal() {
               {error}
             </div>
           )}
-          <button className="btn btn-primary btn-block" onClick={() => setError(checkout({ isDelivery, address }))}>
-            Continue to secure checkout · {money(subtotal)}
+          <button className="btn btn-primary btn-block" onClick={submit} disabled={pending}>
+            {pending ? "Starting secure checkout…" : `Continue to secure checkout · ${money(subtotal)}`}
           </button>
           <button className="link-btn muted-link" style={{ justifySelf: "center", alignSelf: "center" }} onClick={clearCart}>
             Clear cart

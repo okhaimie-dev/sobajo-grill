@@ -13,9 +13,9 @@ import {
   MenuItem,
   hasSpiceOption,
   sideOptions,
-  SQUARE_CHECKOUT_URL,
 } from "@/lib/menu";
 import { track } from "@/lib/analytics";
+import { BASE_PATH } from "@/lib/assets";
 
 export interface CartConfig {
   variation: string;
@@ -42,8 +42,8 @@ interface CartContextValue {
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
-  /** Validate and open the Square checkout page. Returns an error message, or null on success. */
-  checkout: (delivery: { isDelivery: boolean; address: string }) => string | null;
+  /** Validate, create a Square checkout link and go to it. Resolves to an error message, or null on success. */
+  checkout: (order: { isDelivery: boolean; address: string; time: string }) => Promise<string | null>;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -65,6 +65,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Restore a previous cart (small persistence upgrade over the demo).
   useEffect(() => {
+    // Back from a paid Square checkout: drop the saved cart and tidy the URL.
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") === "success") {
+      try {
+        window.localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // storage may be unavailable
+      }
+      params.delete("checkout");
+      const qs = params.toString();
+      window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : "") + window.location.hash);
+    }
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
@@ -141,8 +153,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const closeCart = useCallback(() => setCartOpen(false), []);
 
   const checkout = useCallback(
-    (delivery: { isDelivery: boolean; address: string }) => {
-      const { isDelivery, address } = delivery;
+    async (order: { isDelivery: boolean; address: string; time: string }) => {
+      const { isDelivery, address, time } = order;
       if (!lines.length) return "Please add at least one item.";
       if (isDelivery && !address.trim()) return "Please enter a delivery address.";
       track("begin_checkout", {
@@ -150,8 +162,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         fulfillment: isDelivery ? "delivery" : "pickup",
         items: lines.map((l) => ({ item_name: l.name, item_variant: l.variation, price: l.unitPrice, quantity: l.quantity })),
       });
-      window.open(SQUARE_CHECKOUT_URL, "_blank", "noopener");
-      return null;
+      try {
+        const res = await fetch(`${BASE_PATH}/api/checkout/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            lines: lines.map(({ name, variation, quantity, spice, side, notes }) => ({ name, variation, quantity, spice, side, notes })),
+            fulfillment: isDelivery ? "delivery" : "pickup",
+            address,
+            time,
+          }),
+        });
+        const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
+        if (!res.ok || !data.url) return data.error ?? "We couldn't start checkout. Please try again.";
+        window.location.assign(data.url);
+        return null;
+      } catch {
+        return "Network error — please check your connection and try again.";
+      }
     },
     [lines, subtotal]
   );

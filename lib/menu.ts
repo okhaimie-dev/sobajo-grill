@@ -38,8 +38,6 @@ export interface CartLine {
   notes: string;
 }
 
-export const SQUARE_CHECKOUT_URL = "https://squareup.com/your-sobajo-ordering-link"; // TODO: replace with the real Sobajo Square ordering link
-
 // Delivery is fulfilled by DoorDash: no order minimum, and the delivery fee
 // is DoorDash's (shown at checkout) — so neither is modeled here.
 

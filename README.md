@@ -36,7 +36,9 @@ branch gets its own preview URL.
   - `/catering/` — campaign landing page: occasions, tray × pan-size pricing
     matrix, Ndokoti platters, how it works, catering FAQ, quote CTAs.
 - **Ordering** — native `<dialog>` item customizer and cart sheet (pickup /
-  delivery, $100 minimum progress, inline validation) → Square checkout. The
+  delivery, $100 minimum progress, inline validation) → Square hosted
+  checkout: `POST /api/checkout` reprices the cart from `lib/menu.ts` and
+  creates a one-time Square payment link (`lib/square.ts`). The
   cart lives in the root layout, so it follows the guest across pages, and
   persists in `localStorage`.
 - **SEO** — per-page title/description/canonical/Open Graph via
@@ -138,7 +140,11 @@ lib/
   `NEXT_PUBLIC_SITE_URL=https://sobajogrill.com` and drop
   `NEXT_PUBLIC_BASE_PATH` in the workflow. `robots.txt` is only honored at a
   domain root, and the canonical/OG URLs should be the brand domain.
-- Replace the placeholder Square link in **`lib/menu.ts` → `SQUARE_CHECKOUT_URL`**.
+- **Square** — set `SQUARE_ACCESS_TOKEN` / `SQUARE_LOCATION_ID` (see
+  `.env.example`). Sandbox by default: pay with test card `4111 1111 1111 1111`,
+  any future expiry, CVV `111`, any ZIP. Set `SQUARE_ENVIRONMENT=production`
+  with production credentials to go live. Orders show up in the Square
+  Dashboard with pickup/delivery details in the payment note.
 - Menu card photos are Unsplash placeholders (`lib/menu.ts`) — swap in real
   Sobajo food photography; `public/hero.jpg` is the only real dish photo today.
 - Reviews in `components/reviews.tsx` are static — wire to Google reviews.
