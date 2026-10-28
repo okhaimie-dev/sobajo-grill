@@ -50,10 +50,6 @@ export const CATERING_FAQS: { q: string; a: string }[] = [
     a: `Yes — catering delivery is handled by DoorDash, and DoorDash's delivery fee is shown at checkout. Pickup is available at ${SITE.address.street}, ${SITE.address.city}.`,
   },
   {
-    q: "Can I choose the spice level for catering trays?",
-    a: "Yes — trays can be made Mild, Medium, Hot or Extra Hot, so the whole crowd is covered. Fire-Grilled Fish trays are made without suya spice.",
-  },
-  {
     q: "What events do you cater?",
     a: "Offices, churches, birthdays, graduations, weddings, watch parties and community events — anywhere people gather around good food.",
   },

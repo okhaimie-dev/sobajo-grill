@@ -82,11 +82,6 @@ export const CAMPAIGNS: Campaign[] = [
         title: "Feed the whole family",
         text: "Half and full pans, plus Ndokoti platters that serve from 1–2 up to 4–6.",
       },
-      {
-        icon: "pepper",
-        title: "Spice for every guest",
-        text: "Mild for the kids, Extra Hot for the uncles — choose per dish.",
-      },
     ],
     cta: {
       title: "Make this Thanksgiving one to remember.",

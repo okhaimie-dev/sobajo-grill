@@ -46,7 +46,7 @@ export default function Delivery() {
           <li className="step">
             <div>
               <strong>Build your order</strong>
-              <span>Pick dishes, sizes and spice from the menu.</span>
+              <span>Pick dishes, sizes and sides from the menu.</span>
             </div>
           </li>
           <li className="step">

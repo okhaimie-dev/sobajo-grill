@@ -31,7 +31,7 @@ export default function MenuPage() {
             The Sobajo <span className="accent">menu.</span>
           </>
         }
-        lede="Tap any dish to choose size, spice level and sides, then pick pickup or delivery at checkout."
+        lede="Tap any dish to choose size and sides, then pick pickup or delivery at checkout."
       >
         <div className="hero-meta">
           <span>
@@ -39,9 +39,6 @@ export default function MenuPage() {
           </span>
           <span>
             <Icon name="truck" /> Delivery via DoorDash · no minimum
-          </span>
-          <span>
-            <Icon name="pepper" /> Mild to Extra Hot
           </span>
           <Link href="/catering/">
             <Icon name="users" /> Catering trays

@@ -11,7 +11,6 @@ function CartItemRow({ line }: { line: CartLine }) {
   const { removeItem } = useCart();
   const details = [
     line.variation + (line.quantity > 1 ? ` × ${line.quantity}` : ""),
-    line.spice,
     line.side,
     line.notes,
   ].filter(Boolean);

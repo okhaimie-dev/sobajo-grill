@@ -49,7 +49,7 @@ export default function CateringTrays({ items }: { items: MenuItem[] }) {
               <tr key={item.name}>
                 <th scope="row">
                   <strong>{item.name.replace(/ (Catering )?Tray$/, "")}</strong>
-                  <span>{options.length ? `${options.join(" or ")} · ` : ""}{item.spice === false ? "No suya spice" : "Mild to Extra Hot"}</span>
+                  <span>{[options.join(" or "), item.name.startsWith("Fire-Grilled Fish") ? "No suya spice" : ""].filter(Boolean).join(" · ")}</span>
                 </th>
                 {SIZES.map((s) => (
                   <td key={s} data-label={s}>

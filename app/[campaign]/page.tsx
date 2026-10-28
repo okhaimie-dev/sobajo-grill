@@ -124,7 +124,7 @@ export default async function CampaignPage({ params }: Props) {
               </h2>
             </div>
             <p className="section-lede">
-              Add dishes to your order, pick sizes and spice — then send your pre-order request
+              Add dishes to your order, pick sizes and sides — then send your pre-order request
               below and we&apos;ll confirm everything with you.
             </p>
           </div>

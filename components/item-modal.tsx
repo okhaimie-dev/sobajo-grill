@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import {
   MenuItem,
-  SPICE_OPTIONS,
-  hasSpiceOption,
   money,
   price,
   sideOptions,
@@ -14,12 +12,9 @@ import { Icon } from "./icons";
 import { itemImageProps } from "./menu-items";
 import { useDialog } from "./use-dialog";
 
-type Spice = (typeof SPICE_OPTIONS)[number];
-
 export default function ItemModal() {
   const { activeItem, activeVariation, closeItem, addConfiguredItem } = useCart();
   const [variationIdx, setVariationIdx] = useState(0);
-  const [spice, setSpice] = useState<Spice>("Medium");
   const [sideIdx, setSideIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
@@ -31,13 +26,11 @@ export default function ItemModal() {
   useEffect(() => {
     if (!item) return;
     setVariationIdx(activeVariation);
-    setSpice("Medium");
     setSideIdx(0);
     setQuantity(1);
     setNotes("");
   }, [item, activeVariation]);
 
-  const spices = item ? hasSpiceOption(item) : false;
   const sides = item ? sideOptions(item) : [];
   const variation = item?.variations[variationIdx];
   const side = sides[sideIdx];
@@ -50,7 +43,6 @@ export default function ItemModal() {
       variation: variation[0],
       unitBasePrice: unit,
       quantity: Math.max(1, quantity),
-      spice: spices ? spice : "",
       side: side ? side[0] : "",
       sidePrice: side?.[1] ?? 0,
       notes,
@@ -98,27 +90,6 @@ export default function ItemModal() {
                         />
                         <span>
                           {name} <em>{price(p)}</em>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-              )}
-
-              {spices && (
-                <fieldset className="choices">
-                  <legend>Spice level</legend>
-                  <div className="choice-row">
-                    {SPICE_OPTIONS.map((s, idx) => (
-                      <label className="choice" key={s}>
-                        <input type="radio" name="spice" checked={spice === s} onChange={() => setSpice(s)} />
-                        <span>
-                          {s}
-                          <span className="peppers" aria-hidden="true">
-                            {Array.from({ length: idx + 1 }, (_, i) => (
-                              <Icon key={i} name="pepper" />
-                            ))}
-                          </span>
                         </span>
                       </label>
                     ))}

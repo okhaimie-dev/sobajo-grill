@@ -18,8 +18,6 @@ export interface MenuItem {
   variations: [string, number][];
   /** "optional" → side sold as extra; "included" → one side comes with the item. */
   sideMode?: "optional" | "included";
-  /** false → no spice level offered (fish, drinks…). Default is spice-eligible. */
-  spice?: boolean;
   available?: boolean;
 }
 
@@ -33,15 +31,12 @@ export interface CartLine {
   quantity: number;
   /** unitPrice * quantity */
   price: number;
-  spice: string;
   side: string;
   notes: string;
 }
 
 // Delivery is fulfilled by DoorDash: no order minimum, and the delivery fee
 // is DoorDash's (shown at checkout) — so neither is modeled here.
-
-export const SPICE_OPTIONS = ["Mild", "Medium", "Hot", "Extra Hot"] as const;
 
 export function money(v: number): string {
   return "$" + v.toFixed(2);
@@ -54,10 +49,6 @@ export function price(v: number): string {
 
 export function fromPrice(item: MenuItem): number {
   return Math.min(...item.variations.map((v) => v[1]));
-}
-
-export function hasSpiceOption(item: MenuItem): boolean {
-  return item.spice !== false && item.section !== "drinks";
 }
 
 export function sideOptions(item: MenuItem): [string, number][] {
@@ -79,8 +70,8 @@ export const items: MenuItem[] = [
   { section: "grill", name: "Obasanjo Fire Chicken", badge: "Signature", description: "A tribute to our Nigerian community and the customers who helped shape the Sobajo journey—fire-grilled chicken with bold spice, heat, onions, and unmistakable Sobajo character.", image: U("photo-1532550907401-a500c9a57435"), variations: [["Whole Chicken", 25]], available: true },
   { section: "grill", name: "BBQ Chicken", description: "Sobajo BBQ Chicken celebrates the barbecue side of our story—fire, smoke, char, and the joy of sharing grilled chicken around the table. It brings familiar American barbecue comfort together with Sobajo’s bold African personality, creating a simple, smoky meal made for family, friends, and gatherings.", image: U("photo-1598103442097-8b74394b95c6"), variations: [["Half Chicken", 15], ["Whole Chicken", 25]], available: true },
   { section: "grill", name: "Sobajo Smoked Turkey Wings", badge: "Back by demand", description: "Back by popular demand. Our customers asked for them, so Sobajo Smoked Turkey Wings return with rich smoke, bold seasoning, and hearty fire-grilled character.", image: U("photo-1518492104633-130d0cc84637"), variations: [["2 Wings", 18]], available: true },
-  { section: "grill", name: "Sobajo Fire Wings", description: "Our tribute to Baltimore and America’s love of great wings—bringing Sobajo’s bold African flavors together with a familiar American favorite. Made for game nights, celebrations, family, and friends. Sides are optional and sold separately.", image: U("photo-1562967914-608f82629710"), variations: [["4 Full Wings", 12], ["8 Full Wings", 24], ["20 Full Wings", 50]], sideMode: "optional", spice: true, available: true },
-  { section: "grill", name: "Fire-Grilled Fish", badge: "Side included", description: "Fire-Grilled Fish reflects the place grilled fish holds in African food culture and communal dining. Tilapia or Pompano is cooked over fire, served with onions, Sobajo hot sauce, and one included side—an experience built around spice, smoke, sharing, and the table. No suya spice.", image: U("photo-1519708227418-c8fd9a32b7a2"), variations: [["Whole Tilapia", 25], ["Whole Pompano", 25]], sideMode: "included", spice: false, available: true },
+  { section: "grill", name: "Sobajo Fire Wings", description: "Our tribute to Baltimore and America’s love of great wings—bringing Sobajo’s bold African flavors together with a familiar American favorite. Made for game nights, celebrations, family, and friends. Sides are optional and sold separately.", image: U("photo-1562967914-608f82629710"), variations: [["4 Full Wings", 12], ["8 Full Wings", 24], ["20 Full Wings", 50]], sideMode: "optional", available: true },
+  { section: "grill", name: "Fire-Grilled Fish", badge: "Side included", description: "Fire-Grilled Fish reflects the place grilled fish holds in African food culture and communal dining. Tilapia or Pompano is cooked over fire, served with onions, Sobajo hot sauce, and one included side—an experience built around spice, smoke, sharing, and the table. No suya spice.", image: U("photo-1519708227418-c8fd9a32b7a2"), variations: [["Whole Tilapia", 25], ["Whole Pompano", 25]], sideMode: "included", available: true },
   { section: "ndokoti", name: "Ndokoti Classic", description: "Signature Beef Brisket Suya with jollof rice, fried plantains, fresh onions, and Sobajo hot sauce.", includes: ["Beef Brisket Suya", "Jollof rice", "Fried plantains", "Onions & Sobajo hot sauce"], variations: [["Serves 1–2", 50]], available: true },
   { section: "ndokoti", name: "Ndokoti Deluxe", description: "Everything in Classic plus Obasanjo Fire Chicken.", includes: ["Obasanjo Fire Chicken"], variations: [["Serves 2–3", 100]], available: true },
   { section: "ndokoti", name: "Ndokoti Supreme", description: "Everything in Deluxe plus Sobajo Fire Wings.", includes: ["Sobajo Fire Wings"], variations: [["Serves 3–4", 150]], available: true },
@@ -89,21 +80,21 @@ export const items: MenuItem[] = [
   { section: "catering", name: "Obasanjo Fire Chicken Tray", description: "Catering tray of Obasanjo Fire Chicken.", image: U("photo-1532550907401-a500c9a57435"), variations: [["Half Shallow", 50], ["Half Deep", 90], ["Full Shallow", 150], ["Full Deep", 250]], available: true },
   { section: "catering", name: "BBQ Chicken Tray", description: "Catering tray of charcoal BBQ chicken.", image: U("photo-1598103442097-8b74394b95c6"), variations: [["Half Shallow", 50], ["Half Deep", 70], ["Full Shallow", 120], ["Full Deep", 200]], available: true },
   { section: "catering", name: "Turkey Wings Tray", description: "Catering tray of smoked turkey wings.", image: U("photo-1518492104633-130d0cc84637"), variations: [["Half Shallow", 80], ["Half Deep", 130], ["Full Shallow", 220], ["Full Deep", 350]], available: true },
-  { section: "catering", name: "Sobajo Fire Wings Catering Tray", description: "Catering tray of Sobajo Fire Wings with bold fire-grilled flavor.", image: U("photo-1562967914-608f82629710"), variations: [["Half Deep", 50], ["Full Shallow", 100], ["Full Deep", 150]], spice: true, available: true },
-  { section: "catering", name: "Fire-Grilled Fish Catering Tray", description: "Choose Tilapia or Pompano. Served with onions and Sobajo hot sauce; no suya spice.", image: U("photo-1519708227418-c8fd9a32b7a2"), variations: [["Tilapia — Half Deep", 80], ["Tilapia — Full Shallow", 120], ["Tilapia — Full Deep", 180], ["Pompano — Half Deep", 80], ["Pompano — Full Shallow", 120], ["Pompano — Full Deep", 180]], spice: false, available: true },
+  { section: "catering", name: "Sobajo Fire Wings Catering Tray", description: "Catering tray of Sobajo Fire Wings with bold fire-grilled flavor.", image: U("photo-1562967914-608f82629710"), variations: [["Half Deep", 50], ["Full Shallow", 100], ["Full Deep", 150]], available: true },
+  { section: "catering", name: "Fire-Grilled Fish Catering Tray", description: "Choose Tilapia or Pompano. Served with onions and Sobajo hot sauce; no suya spice.", image: U("photo-1519708227418-c8fd9a32b7a2"), variations: [["Tilapia — Half Deep", 80], ["Tilapia — Full Shallow", 120], ["Tilapia — Full Deep", 180], ["Pompano — Half Deep", 80], ["Pompano — Full Shallow", 120], ["Pompano — Full Deep", 180]], available: true },
   { section: "sides", name: "Jollof Rice", description: "Smoky, richly seasoned West African rice.", variations: [["Standard", 5]], available: true },
   { section: "sides", name: "Fried Plantains", description: "Sweet, golden, and caramelized.", variations: [["Standard", 5]], available: true },
   { section: "sides", name: "Coleslaw", description: "Cool and refreshing.", variations: [["Standard", 4]], available: true },
   { section: "sides", name: "Extra Suya Spice", description: "Add extra authentic suya spice.", variations: [["Standard", 2]], available: true },
   { section: "sides", name: "Extra Hot Sauce", description: "Extra house hot sauce.", variations: [["Standard", 2]], available: true },
   { section: "sides", name: "Extra Onions", description: "Fresh sliced onions.", variations: [["Standard", 1]], available: true },
-  { section: "drinks", name: "Zobo", description: "Refreshing hibiscus drink with bold West African flavor.", variations: [["Bottle", 5]], spice: false, available: true },
-  { section: "drinks", name: "Fresh Ginger Drink", description: "Fresh house-made ginger drink with a bright, spicy finish.", variations: [["Bottle", 5]], spice: false, available: true },
-  { section: "drinks", name: "Pineapple Ginger Drink", description: "Tropical pineapple blended with fresh ginger.", variations: [["Bottle", 5]], spice: false, available: true },
-  { section: "drinks", name: "Coca-Cola", description: "Chilled Coca-Cola.", variations: [["Can", 3]], spice: false, available: true },
-  { section: "drinks", name: "Sprite", description: "Chilled lemon-lime soda.", variations: [["Can", 3]], spice: false, available: true },
-  { section: "drinks", name: "Fanta Orange", description: "Chilled orange soda.", variations: [["Can", 3]], spice: false, available: true },
-  { section: "drinks", name: "Bottled Water", description: "Cold bottled water.", variations: [["Bottle", 2]], spice: false, available: true },
+  { section: "drinks", name: "Zobo", description: "Refreshing hibiscus drink with bold West African flavor.", variations: [["Bottle", 5]], available: true },
+  { section: "drinks", name: "Fresh Ginger Drink", description: "Fresh house-made ginger drink with a bright, spicy finish.", variations: [["Bottle", 5]], available: true },
+  { section: "drinks", name: "Pineapple Ginger Drink", description: "Tropical pineapple blended with fresh ginger.", variations: [["Bottle", 5]], available: true },
+  { section: "drinks", name: "Coca-Cola", description: "Chilled Coca-Cola.", variations: [["Can", 3]], available: true },
+  { section: "drinks", name: "Sprite", description: "Chilled lemon-lime soda.", variations: [["Can", 3]], available: true },
+  { section: "drinks", name: "Fanta Orange", description: "Chilled orange soda.", variations: [["Can", 3]], available: true },
+  { section: "drinks", name: "Bottled Water", description: "Cold bottled water.", variations: [["Bottle", 2]], available: true },
 ];
 
 export interface MenuSection {

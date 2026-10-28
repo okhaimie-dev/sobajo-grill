@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     const quantity = Number(raw.quantity);
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) return json(400, { error: "Invalid quantity." });
 
-    const note = [str(raw.spice, 20), side && side[0] !== "No Side" ? side[0] : "", str(raw.notes)]
+    const note = [side && side[0] !== "No Side" ? side[0] : "", str(raw.notes)]
       .filter(Boolean)
       .join(" · ");
     lineItems.push({

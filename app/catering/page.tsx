@@ -123,8 +123,7 @@ export default function CateringPage() {
               </h2>
             </div>
             <p className="section-lede">
-              Prices are per pan. Choose spice level and add notes when you add a tray to your
-              order.
+              Prices are per pan. Add notes when you add a tray to your order.
             </p>
           </div>
           <CateringTrays items={trays.items} />

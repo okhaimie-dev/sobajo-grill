@@ -11,7 +11,6 @@ import {
 import {
   CartLine,
   MenuItem,
-  hasSpiceOption,
   sideOptions,
 } from "@/lib/menu";
 import { track } from "@/lib/analytics";
@@ -21,7 +20,6 @@ export interface CartConfig {
   variation: string;
   unitBasePrice: number;
   quantity: number;
-  spice: string;
   side: string;
   sidePrice: number;
   notes: string;
@@ -127,7 +125,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         unitPrice: cfg.unitBasePrice,
         quantity: cfg.quantity,
         price: cfg.unitBasePrice * cfg.quantity,
-        spice: cfg.spice,
         side: cfg.side,
         notes: cfg.notes,
       },
@@ -167,7 +164,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            lines: lines.map(({ name, variation, quantity, spice, side, notes }) => ({ name, variation, quantity, spice, side, notes })),
+            lines: lines.map(({ name, variation, quantity, side, notes }) => ({ name, variation, quantity, side, notes })),
             fulfillment: isDelivery ? "delivery" : "pickup",
             address,
             time,
@@ -222,4 +219,4 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
-export { hasSpiceOption, sideOptions };
+export { sideOptions };

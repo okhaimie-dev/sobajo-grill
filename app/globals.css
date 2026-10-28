@@ -838,8 +838,6 @@ fieldset.choices { border: 0; margin: 0; padding: 0; min-width: 0; }
 .choice > input:checked + span { border-color: var(--red); background: rgba(255, 0, 43, 0.12); }
 .choice > input:checked + span em { color: var(--gold); }
 .choice > input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
-.peppers { display: inline-flex; color: var(--ember); }
-.peppers svg { width: 14px; height: 14px; }
 
 .stepper {
   display: inline-flex; align-items: center; border-radius: var(--r-pill);

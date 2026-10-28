@@ -54,7 +54,7 @@ export default function LeadForm({
   const pathname = usePathname();
   const { lines, clearCart } = useCart();
   const cartItems = lines.map(
-    (l) => `${l.name} — ${[l.variation, l.quantity > 1 ? `× ${l.quantity}` : "", l.spice, l.side, l.notes].filter(Boolean).join(" · ")} (${money(l.price)})`
+    (l) => `${l.name} — ${[l.variation, l.quantity > 1 ? `× ${l.quantity}` : "", l.side, l.notes].filter(Boolean).join(" · ")} (${money(l.price)})`
   );
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
@@ -152,7 +152,7 @@ export default function LeadForm({
           </div>
           <label className="field lead-wide">
             <span className="field-label">Anything else?</span>
-            <textarea className="input" name="message" rows={3} placeholder="Extra dishes, spice preferences, pickup or DoorDash delivery…" />
+            <textarea className="input" name="message" rows={3} placeholder="Extra dishes, pickup or DoorDash delivery…" />
           </label>
         </div>
       ) : kind === "catering" ? (
