@@ -44,6 +44,7 @@ export default function LeadForm({
   compact = false,
   campaign,
   maxDate,
+  delivery = true,
 }: {
   kind: LeadKind;
   compact?: boolean;
@@ -51,6 +52,8 @@ export default function LeadForm({
   campaign?: string;
   /** Latest selectable pickup date (YYYY-MM-DD). */
   maxDate?: string;
+  /** Pre-orders: whether the campaign offers delivery (else pickup only). */
+  delivery?: boolean;
 }) {
   const pathname = usePathname();
   const site = useSite();
@@ -154,7 +157,7 @@ export default function LeadForm({
           </div>
           <label className="field lead-wide">
             <span className="field-label">Anything else?</span>
-            <textarea className="input" name="message" rows={3} placeholder="Extra dishes, pickup or DoorDash delivery…" />
+            <textarea className="input" name="message" rows={3} placeholder={delivery ? "Extra dishes, pickup or DoorDash delivery…" : "Extra dishes, preferred pickup time…"} />
           </label>
         </div>
       ) : kind === "catering" ? (

@@ -66,6 +66,10 @@ export async function POST(request: Request) {
   }
 
   const isDelivery = body.fulfillment === "delivery";
+  const pickupOnly = rawLines
+    .map((raw) => items.find((i) => i.name === (raw as Record<string, unknown>)?.name))
+    .find((i) => i?.pickupOnly);
+  if (isDelivery && pickupOnly) return json(400, { error: `${pickupOnly.name} is pickup only — please choose pickup.` });
   const address = str(body.address, 300);
   if (isDelivery && !address) return json(400, { error: "Please enter a delivery address." });
   const time = str(body.time, 40);

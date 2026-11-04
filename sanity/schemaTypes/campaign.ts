@@ -69,6 +69,14 @@ export const campaign = defineType({
       group: "basics",
       validation: (r) => r.required().max(34),
     }),
+    defineField({
+      name: "delivery",
+      title: "Offer delivery (DoorDash)",
+      description: "Off → the page says pickup only. To stop featured dishes being delivered, also tick “Pickup only” on those menu items.",
+      type: "boolean",
+      group: "basics",
+      initialValue: false,
+    }),
     defineField({ name: "eventDate", title: "Event / holiday date", type: "date", group: "basics" }),
     defineField({ name: "orderBy", title: "Last day to pre-order", description: "Hidden on the page until set.", type: "date", group: "basics" }),
     defineField({

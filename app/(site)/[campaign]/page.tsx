@@ -92,9 +92,15 @@ export default async function CampaignPage({ params }: Props) {
               <Icon name="clock" /> Order by {formatDay(c.orderBy)}
             </span>
           )}
-          <span>
-            <Icon name="truck" /> Pickup or DoorDash delivery
-          </span>
+          {c.delivery ? (
+            <span>
+              <Icon name="truck" /> Pickup or DoorDash delivery
+            </span>
+          ) : (
+            <span>
+              <Icon name="store" /> Pickup only · {site.address.street}
+            </span>
+          )}
         </div>
       </PageHero>
 
@@ -198,12 +204,12 @@ export default async function CampaignPage({ params }: Props) {
               </div>
               <div>
                 <dt>Delivery</dt>
-                <dd>Via DoorDash</dd>
+                <dd>{c.delivery ? "Via DoorDash" : "Not available — pickup only"}</dd>
               </div>
             </dl>
           </div>
           <div className="quote-card" data-hide-fab>
-            <LeadForm kind="preorder" campaign={c.slug} maxDate={c.eventDate} />
+            <LeadForm kind="preorder" campaign={c.slug} maxDate={c.eventDate} delivery={c.delivery} />
           </div>
         </div>
       </section>

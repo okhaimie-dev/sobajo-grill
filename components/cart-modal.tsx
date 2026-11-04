@@ -46,7 +46,9 @@ export default function CartModal() {
 
   const ref = useDialog(cartOpen, closeCart);
 
-  const isDelivery = orderType === "delivery";
+  // Any pickup-only item (e.g. the Thanksgiving turkey) makes the whole order pickup.
+  const pickupOnly = lines.filter((l) => l.pickupOnly).map((l) => l.name);
+  const isDelivery = pickupOnly.length === 0 && orderType === "delivery";
   const empty = lines.length === 0;
 
   return (
@@ -85,6 +87,12 @@ export default function CartModal() {
                 ))}
               </ul>
 
+              {pickupOnly.length > 0 ? (
+                <div className="notice" role="status">
+                  <Icon name="store" /> Pickup only — {[...new Set(pickupOnly)].join(", ")}{" "}
+                  {new Set(pickupOnly).size > 1 ? "aren't" : "isn't"} available for delivery.
+                </div>
+              ) : (
               <fieldset className="choices">
                 <legend>How would you like it?</legend>
                 <div className="segmented">
@@ -108,6 +116,7 @@ export default function CartModal() {
                   ))}
                 </div>
               </fieldset>
+              )}
 
               {isDelivery && (
                 <div className="notice" role="status">

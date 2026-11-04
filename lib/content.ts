@@ -46,7 +46,7 @@ const QUERY = /* groq */ `{
     _id, title, tab, "id": anchor.current, layout, note
   },
   "items": *[_type == "menuItem" && defined(section._ref)] | order(sortOrder asc, name asc) {
-    name, description, badge, includes, sideMode, offeredAsSide,
+    name, description, badge, includes, sideMode, offeredAsSide, campaignOnly, pickupOnly,
     "status": coalesce(status, "available"),
     "sectionRef": section._ref,
     "variations": variations[defined(label) && defined(price)]{ label, price },
@@ -54,7 +54,7 @@ const QUERY = /* groq */ `{
   },
   "campaigns": *[_type == "campaign" && defined(slug.current)] | order(bannerFrom desc) {
     name, "slug": slug.current, bannerFrom, bannerUntil, bannerText, bannerShort,
-    eventDate, orderBy, pickupWindows, seo, hero, og, showPlatters, reasons, cta, faqs,
+    eventDate, orderBy, pickupWindows, seo, hero, og, showPlatters, reasons, cta, faqs, delivery,
     "featured": featured[]->name, "sides": sides[]->name
   },
   "faqs": *[_type == "faq"] | order(sortOrder asc) { page, "q": question, "a": answer },
@@ -77,6 +77,7 @@ interface Raw {
   items: {
     name: string; description?: string; badge?: string; includes?: string[];
     sideMode?: "none" | "optional" | "included"; offeredAsSide?: boolean; status?: ItemStatus;
+    campaignOnly?: boolean; pickupOnly?: boolean;
     sectionRef: string; variations?: { label: string; price: number }[]; image?: SanityImage;
   }[];
   campaigns: (Omit<Campaign, "hero" | "featured" | "sides" | "reasons" | "faqs" | "pickupWindows" | "orderBy"> & {
@@ -132,6 +133,8 @@ function normalize(raw: Raw): Content {
         variations: i.variations!.map((v) => [v.label, v.price]),
         sideMode: i.sideMode === "optional" || i.sideMode === "included" ? i.sideMode : undefined,
         offeredAsSide: i.offeredAsSide ?? false,
+        campaignOnly: i.campaignOnly ?? false,
+        pickupOnly: i.pickupOnly ?? false,
         status: i.status ?? "available",
         available: (i.status ?? "available") === "available",
       }))
@@ -151,6 +154,7 @@ function normalize(raw: Raw): Content {
       featured: names(c.featured),
       sides: names(c.sides),
       showPlatters: c.showPlatters ?? false,
+      delivery: c.delivery ?? false,
       reasons: (c.reasons ?? []).map((r) => ({ ...r, icon: r.icon as IconName })),
       faqs: c.faqs ?? [],
     }));

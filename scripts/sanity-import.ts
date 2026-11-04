@@ -135,6 +135,8 @@ async function main() {
       variations: item.variations.map(([label, price]) => ({ _type: "variation", _key: key(), label, price })),
       sideMode: item.sideMode ?? "none",
       offeredAsSide: item.offeredAsSide ?? false,
+      campaignOnly: item.campaignOnly ?? false,
+      pickupOnly: item.pickupOnly ?? false,
       ...(item.includes && { includes: item.includes }),
       sortOrder: n * 10,
     });
@@ -165,6 +167,7 @@ async function main() {
       featured: refs(c.featured),
       sides: refs(c.sides),
       showPlatters: c.showPlatters,
+      delivery: c.delivery,
       seo: c.seo,
       og: c.og,
     });

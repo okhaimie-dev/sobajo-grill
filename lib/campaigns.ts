@@ -33,6 +33,8 @@ export interface Campaign {
   hero: { eyebrow: string; title: string; accent: string; lede: string; image: string; imageAlt: string };
   /** Share-image headline (two lines). */
   og: { line1: string; line2: string };
+  /** DoorDash delivery offered for this campaign; false → pickup only (page copy follows). */
+  delivery: boolean;
   /** Main dishes, by exact menu name. */
   featured: string[];
   /** Ndokoti platters block. */
@@ -51,33 +53,34 @@ export const CAMPAIGNS: Campaign[] = [
     // TODO(owner): adjust when the bar should start/stop showing.
     bannerFrom: "2026-11-01",
     bannerUntil: "2026-11-26",
-    bannerText: "Thanksgiving pre-orders are open — smoked turkey wings, suya trays & more",
+    bannerText: "Thanksgiving pre-orders are open — smoked whole turkey, suya trays & more",
     bannerShort: "Thanksgiving pre-orders open",
     eventDate: "2026-11-26",
     orderBy: null,
     pickupWindows: null,
     seo: {
-      title: "Thanksgiving in Baltimore — Smoked Turkey Wings & Suya Trays",
+      title: "Thanksgiving in Baltimore — Smoked Whole Turkey & Suya Trays",
       description:
-        "Bring the fire to your Thanksgiving table: Sobajo smoked turkey wings, turkey wing and beef brisket suya trays, Ndokoti platters, jollof and plantains. Pre-order for pickup on Liberty Road or delivery via DoorDash.",
+        "Bring the fire to your Thanksgiving table: a Sobajo smoked whole turkey, beef brisket suya trays, Ndokoti platters, jollof and plantains. Pre-order for pickup on Liberty Road.",
     },
     hero: {
       eyebrow: "Thanksgiving 2026",
       title: "This Thanksgiving,",
       accent: "bring the fire.",
-      lede: "Smoked turkey wings, brisket suya trays, smoky jollof and sweet plantains — West African heritage meets American barbecue, for the whole table. Pre-order for pickup, or get it delivered via DoorDash.",
+      lede: "A smoked whole turkey, brisket suya trays, smoky jollof and sweet plantains — West African heritage meets American barbecue, for the whole table. Pre-order for pickup on Liberty Road.",
       image: "/hero.jpg",
       imageAlt: "Sobajo brisket suya cooking over an open flame grill",
     },
     og: { line1: "Thanksgiving,", line2: "off the fire." },
-    featured: ["Sobajo Smoked Turkey Wings", "Turkey Wings Tray", "Beef Brisket Suya Tray"],
+    delivery: false,
+    featured: ["Sobajo Smoked Whole Turkey", "Beef Brisket Suya Tray"],
     showPlatters: true,
     sides: ["Jollof Rice", "Fried Plantains", "Coleslaw"],
     reasons: [
       {
         icon: "flame",
         title: "Skip the oven",
-        text: "Let us handle the bird: Sobajo smoked turkey wings, by the plate or by the tray.",
+        text: "Let us handle the bird: a whole Sobajo smoked turkey, ready for your table.",
       },
       {
         icon: "users",
@@ -87,7 +90,7 @@ export const CAMPAIGNS: Campaign[] = [
     ],
     cta: {
       title: "Make this Thanksgiving one to remember.",
-      text: "Smoked turkey wings, suya trays and all the sides — pre-order now and let us bring the fire.",
+      text: "A smoked whole turkey, suya trays and all the sides — pre-order now and let us bring the fire.",
     },
     faqs: [
       {
@@ -96,7 +99,7 @@ export const CAMPAIGNS: Campaign[] = [
       },
       {
         q: "Can I get my Thanksgiving order delivered?",
-        a: "Yes — delivery is handled by DoorDash. Pickup is at 7108 Liberty Road, Baltimore.",
+        a: "Thanksgiving orders are pickup only, at 7108 Liberty Road, Baltimore. We'll confirm your pickup time with your order.",
       },
       {
         q: "What should I order for a big group?",

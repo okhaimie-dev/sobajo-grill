@@ -127,6 +127,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         price: cfg.unitBasePrice * cfg.quantity,
         side: cfg.side,
         notes: cfg.notes,
+        ...(item.pickupOnly && { pickupOnly: true }),
       },
     ]);
     track("add_to_cart", {

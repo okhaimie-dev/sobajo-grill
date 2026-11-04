@@ -167,6 +167,20 @@ export const menuItem = defineType({
       initialValue: false,
     }),
     defineField({
+      name: "campaignOnly",
+      title: "Only on campaign pages",
+      description: "Hide from the menu, home and catering pages — sell it only where a campaign features it (e.g. the Thanksgiving turkey).",
+      type: "boolean",
+      initialValue: false,
+    }),
+    defineField({
+      name: "pickupOnly",
+      title: "Pickup only",
+      description: "Can't be delivered. A cart with this item switches to pickup, and checkout refuses delivery.",
+      type: "boolean",
+      initialValue: false,
+    }),
+    defineField({
       name: "includes",
       title: "What this tier adds",
       description: "Ndokoti platters only: what this level adds on top of the one before.",
