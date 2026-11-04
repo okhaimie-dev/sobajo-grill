@@ -80,6 +80,24 @@ export const campaign = defineType({
     defineField({ name: "eventDate", title: "Event / holiday date", type: "date", group: "basics" }),
     defineField({ name: "orderBy", title: "Last day to pre-order", description: "Hidden on the page until set.", type: "date", group: "basics" }),
     defineField({
+      name: "pickupFrom",
+      title: "First pickup day",
+      description: "Pre-order form only lets guests pick a day in this range. Leave both empty to allow any day up to the event.",
+      type: "date",
+      group: "basics",
+    }),
+    defineField({
+      name: "pickupUntil",
+      title: "Last pickup day",
+      type: "date",
+      group: "basics",
+      validation: (r) =>
+        r.custom((until, ctx) => {
+          const from = (ctx.parent as { pickupFrom?: string })?.pickupFrom;
+          return !until || !from || until >= from ? true : "Must be on or after the first pickup day.";
+        }),
+    }),
+    defineField({
       name: "pickupWindows",
       title: "Pickup windows",
       description: "e.g. “Wed, Nov 25 · 12–8 PM”. Hidden on the page until set.",

@@ -95,6 +95,12 @@ export function parseLead(body: unknown, campaigns: Campaign[], today = new Date
     if (date) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return "Please enter a valid pickup date.";
       if (date < today.toISOString().slice(0, 10)) return "The pickup date is in the past.";
+      const last = campaign.pickupUntil ?? campaign.eventDate;
+      if ((campaign.pickupFrom && date < campaign.pickupFrom) || (last && date > last)) {
+        return campaign.pickupWindows?.length
+          ? `Pickup is ${campaign.pickupWindows.join(" or ")} — please choose one of those days.`
+          : "Please choose a pickup date within the pickup window.";
+      }
       lead.pickupDate = date;
     }
     if (Array.isArray(b.items)) {

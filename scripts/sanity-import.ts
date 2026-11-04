@@ -160,6 +160,8 @@ async function main() {
       ...(c.eventDate && { eventDate: c.eventDate }),
       ...(c.orderBy && { orderBy: c.orderBy }),
       ...(c.pickupWindows && { pickupWindows: c.pickupWindows }),
+      ...(c.pickupFrom && { pickupFrom: c.pickupFrom }),
+      ...(c.pickupUntil && { pickupUntil: c.pickupUntil }),
       hero: { ...c.hero, image: await image(c.hero.image) },
       reasons: c.reasons.map((r) => ({ ...r, _type: "reason", _key: key() })),
       cta: c.cta,

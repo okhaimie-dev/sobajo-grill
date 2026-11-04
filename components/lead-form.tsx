@@ -43,6 +43,7 @@ export default function LeadForm({
   kind,
   compact = false,
   campaign,
+  minDate,
   maxDate,
   delivery = true,
 }: {
@@ -50,7 +51,8 @@ export default function LeadForm({
   compact?: boolean;
   /** Campaign slug (pre-orders). */
   campaign?: string;
-  /** Latest selectable pickup date (YYYY-MM-DD). */
+  /** Pickup date range offered (YYYY-MM-DD). */
+  minDate?: string;
   maxDate?: string;
   /** Pre-orders: whether the campaign offers delivery (else pickup only). */
   delivery?: boolean;
@@ -135,7 +137,13 @@ export default function LeadForm({
           </label>
           <label className="field">
             <span className="field-label">Preferred pickup date</span>
-            <input className="input" name="pickupDate" type="date" min={today()} max={maxDate} />
+            <input
+              className="input"
+              name="pickupDate"
+              type="date"
+              min={minDate && minDate > today() ? minDate : today()}
+              max={maxDate}
+            />
           </label>
           <label className="field">
             <span className="field-label">Guests</span>

@@ -54,7 +54,7 @@ const QUERY = /* groq */ `{
   },
   "campaigns": *[_type == "campaign" && defined(slug.current)] | order(bannerFrom desc) {
     name, "slug": slug.current, bannerFrom, bannerUntil, bannerText, bannerShort,
-    eventDate, orderBy, pickupWindows, seo, hero, og, showPlatters, reasons, cta, faqs, delivery,
+    eventDate, orderBy, pickupWindows, pickupFrom, pickupUntil, seo, hero, og, showPlatters, reasons, cta, faqs, delivery,
     "featured": featured[]->name, "sides": sides[]->name
   },
   "faqs": *[_type == "faq"] | order(sortOrder asc) { page, "q": question, "a": answer },

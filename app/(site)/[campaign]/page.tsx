@@ -131,8 +131,10 @@ export default async function CampaignPage({ params }: Props) {
               </h2>
             </div>
             <p className="section-lede">
-              Add dishes to your order, pick sizes and sides — then send your pre-order request
-              below and we&apos;ll confirm everything with you.
+              {featured.length + sides.length > 1 ||
+              featured.some((i) => i.variations.length > 1 || i.sideMode)
+                ? "Add dishes to your order, pick sizes and sides — then send your pre-order request below and we'll confirm everything with you."
+                : "Send your pre-order request below and we'll confirm your order, pickup day and payment with you."}
             </p>
           </div>
           <div className="menu-grid">
@@ -209,7 +211,7 @@ export default async function CampaignPage({ params }: Props) {
             </dl>
           </div>
           <div className="quote-card" data-hide-fab>
-            <LeadForm kind="preorder" campaign={c.slug} maxDate={c.eventDate} delivery={c.delivery} />
+            <LeadForm kind="preorder" campaign={c.slug} minDate={c.pickupFrom} maxDate={c.pickupUntil ?? c.eventDate} delivery={c.delivery} />
           </div>
         </div>
       </section>

@@ -28,6 +28,9 @@ export interface Campaign {
   orderBy: string | null;
   /** TODO(owner): pickup days/times, e.g. ["Wed, Nov 25 · 12–8 PM"]. */
   pickupWindows: string[] | null;
+  /** Pre-order pickup date range (YYYY-MM-DD, inclusive); the form only offers these days. */
+  pickupFrom?: string;
+  pickupUntil?: string;
   seo: { title: string; description: string };
   /** image: a /public path or an image base URL that takes `&w=` (Sanity CDN). */
   hero: { eyebrow: string; title: string; accent: string; lede: string; image: string; imageAlt: string };
@@ -53,29 +56,31 @@ export const CAMPAIGNS: Campaign[] = [
     // TODO(owner): adjust when the bar should start/stop showing.
     bannerFrom: "2026-11-01",
     bannerUntil: "2026-11-26",
-    bannerText: "Thanksgiving pre-orders are open — smoked whole turkey, suya trays & more",
+    bannerText: "Thanksgiving pre-orders are open — Sobajo smoked whole turkey, $100",
     bannerShort: "Thanksgiving pre-orders open",
     eventDate: "2026-11-26",
     orderBy: null,
-    pickupWindows: null,
+    pickupWindows: ["Wed, Nov 25", "Thu, Nov 26 (Thanksgiving Day)"],
+    pickupFrom: "2026-11-25",
+    pickupUntil: "2026-11-26",
     seo: {
-      title: "Thanksgiving in Baltimore — Smoked Whole Turkey & Suya Trays",
+      title: "Thanksgiving in Baltimore — Sobajo Smoked Whole Turkey",
       description:
-        "Bring the fire to your Thanksgiving table: a Sobajo smoked whole turkey, beef brisket suya trays, Ndokoti platters, jollof and plantains. Pre-order for pickup on Liberty Road.",
+        "Bring the fire to your Thanksgiving table with a Sobajo smoked whole turkey, $100. Pre-order now and pick up Wednesday, Nov 25 or Thanksgiving Day at 7108 Liberty Road, Baltimore.",
     },
     hero: {
       eyebrow: "Thanksgiving 2026",
       title: "This Thanksgiving,",
       accent: "bring the fire.",
-      lede: "A smoked whole turkey, brisket suya trays, smoky jollof and sweet plantains — West African heritage meets American barbecue, for the whole table. Pre-order for pickup on Liberty Road.",
-      image: "/hero.jpg",
-      imageAlt: "Sobajo brisket suya cooking over an open flame grill",
+      lede: "A whole turkey, smoked and fire-finished the Sobajo way — West African heritage meets American barbecue, the centerpiece for your table. Pre-order now, pick up Nov 25 or Thanksgiving Day.",
+      image: "https://images.unsplash.com/photo-1518492104633-130d0cc84637?auto=format&fit=crop&q=75",
+      imageAlt: "A Sobajo smoked whole turkey, fresh off the fire",
     },
     og: { line1: "Thanksgiving,", line2: "off the fire." },
     delivery: false,
-    featured: ["Sobajo Smoked Whole Turkey", "Beef Brisket Suya Tray"],
-    showPlatters: true,
-    sides: ["Jollof Rice", "Fried Plantains", "Coleslaw"],
+    featured: ["Sobajo Smoked Whole Turkey"],
+    showPlatters: false,
+    sides: [],
     reasons: [
       {
         icon: "flame",
@@ -83,31 +88,27 @@ export const CAMPAIGNS: Campaign[] = [
         text: "Let us handle the bird: a whole Sobajo smoked turkey, ready for your table.",
       },
       {
-        icon: "users",
-        title: "Feed the whole family",
-        text: "Half and full pans, plus Ndokoti platters that serve from 1–2 up to 4–6.",
+        icon: "calendar",
+        title: "Two pickup days",
+        text: "Pick up Wednesday, Nov 25 or Thanksgiving Day, Nov 26 at 7108 Liberty Road.",
       },
     ],
     cta: {
       title: "Make this Thanksgiving one to remember.",
-      text: "A smoked whole turkey, suya trays and all the sides — pre-order now and let us bring the fire.",
+      text: "One whole Sobajo smoked turkey, ready for your table — pre-order now and let us bring the fire.",
     },
     faqs: [
       {
         q: "How do I pre-order for Thanksgiving?",
-        a: "Send a pre-order request on this page with your dishes, preferred pickup date and guest count. We'll confirm the details and payment with you directly.",
+        a: "Send a pre-order request on this page with your preferred pickup day — Wednesday, Nov 25 or Thanksgiving Day, Nov 26. We'll confirm the details and payment with you directly.",
       },
       {
         q: "Can I get my Thanksgiving order delivered?",
-        a: "Thanksgiving orders are pickup only, at 7108 Liberty Road, Baltimore. We'll confirm your pickup time with your order.",
+        a: "Thanksgiving orders are pickup only, at 7108 Liberty Road, Baltimore, on Wednesday, Nov 25 or Thanksgiving Day, Nov 26.",
       },
       {
-        q: "What should I order for a big group?",
-        a: "Catering trays come in half pans (shallow or deep) and full trays. For an all-in-one spread, Ndokoti platters combine brisket suya, chicken, wings and sides and serve up to 4–6.",
-      },
-      {
-        q: "Can you make it less spicy?",
-        a: "Yes — most dishes come Mild, Medium, Hot or Extra Hot, and our fire-grilled fish is made without suya spice.",
+        q: "What's on the Thanksgiving menu?",
+        a: "One thing, done right: the Sobajo smoked whole turkey, $100.",
       },
     ],
   },
