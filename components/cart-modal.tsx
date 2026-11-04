@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { CartLine, money } from "@/lib/menu";
+import { shortDay, todayInBaltimore } from "@/lib/campaigns";
+import { CartLine, allowedPickupDays, money } from "@/lib/menu";
 import { useCart } from "./cart-context";
 import { Icon } from "./icons";
 import { useDialog } from "./use-dialog";
@@ -31,14 +32,22 @@ export default function CartModal() {
 
   const [orderType, setOrderType] = useState<"pickup" | "delivery">("pickup");
   const [orderTime, setOrderTime] = useState("");
+  // Campaign items (e.g. the Thanksgiving turkey): a required pickup day + optional time.
+  const [pickupDay, setPickupDay] = useState("");
+  const [pickupClock, setPickupClock] = useState("");
   const [address, setAddress] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   const submit = async () => {
+    if (pickupDays) {
+      if (!pickupDays.length) return setError("The pickup days for an item in your cart have passed — please remove it.");
+      if (!pickupDays.includes(pickupDay)) return setError("Please choose a pickup day.");
+    }
     setPending(true);
     setError(null);
-    const err = await checkout({ isDelivery, address, time: orderTime });
+    const time = pickupDays ? pickupDay + (pickupClock ? `T${pickupClock}` : "") : orderTime;
+    const err = await checkout({ isDelivery, address, time });
     setError(err);
     // On success the page is navigating to Square; keep the button disabled.
     if (err) setPending(false);
@@ -49,6 +58,10 @@ export default function CartModal() {
   // Any pickup-only item (e.g. the Thanksgiving turkey) makes the whole order pickup.
   const pickupOnly = lines.filter((l) => l.pickupOnly).map((l) => l.name);
   const isDelivery = pickupOnly.length === 0 && orderType === "delivery";
+  const pickupDays = allowedPickupDays(
+    lines.map((l) => l.pickupDates),
+    todayInBaltimore()
+  );
   const empty = lines.length === 0;
 
   return (
@@ -140,15 +153,53 @@ export default function CartModal() {
                 </label>
               )}
 
-              <label className="field">
-                <span className="field-label">Preferred {isDelivery ? "delivery" : "pickup"} time</span>
-                <input
-                  className="input"
-                  type="datetime-local"
-                  value={orderTime}
-                  onChange={(e) => setOrderTime(e.target.value)}
-                />
-              </label>
+              {pickupDays ? (
+                pickupDays.length ? (
+                  <>
+                    <fieldset className="choices">
+                      <legend>Pickup day *</legend>
+                      <div className="segmented">
+                        {pickupDays.map((d) => (
+                          <label key={d}>
+                            <input
+                              type="radio"
+                              name="pickupDay"
+                              value={d}
+                              checked={pickupDay === d}
+                              onChange={() => {
+                                setPickupDay(d);
+                                setError(null);
+                              }}
+                            />
+                            <span>
+                              <Icon name="calendar" />
+                              {shortDay(d)}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
+                    <label className="field">
+                      <span className="field-label">Preferred pickup time (optional)</span>
+                      <input className="input" type="time" value={pickupClock} onChange={(e) => setPickupClock(e.target.value)} />
+                    </label>
+                  </>
+                ) : (
+                  <div className="notice error" role="alert">
+                    The pickup days for an item in your cart have passed — please remove it to check out.
+                  </div>
+                )
+              ) : (
+                <label className="field">
+                  <span className="field-label">Preferred {isDelivery ? "delivery" : "pickup"} time</span>
+                  <input
+                    className="input"
+                    type="datetime-local"
+                    value={orderTime}
+                    onChange={(e) => setOrderTime(e.target.value)}
+                  />
+                </label>
+              )}
 
               <div className="summary">
                 <div className="summary-row">

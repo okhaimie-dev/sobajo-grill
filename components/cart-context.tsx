@@ -128,6 +128,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         side: cfg.side,
         notes: cfg.notes,
         ...(item.pickupOnly && { pickupOnly: true }),
+        ...(item.pickupDates?.length && { pickupDates: item.pickupDates }),
       },
     ]);
     track("add_to_cart", {

@@ -129,6 +129,21 @@ export function activeCampaign(campaigns: Campaign[], now = new Date()): Campaig
   return campaigns.find((c) => c.bannerFrom <= today && today <= c.bannerUntil);
 }
 
+/** Every day from `from` to `until`, inclusive (YYYY-MM-DD). */
+export function daysBetween(from: string, until: string): string[] {
+  const out: string[] = [];
+  for (let d = new Date(`${from}T12:00:00Z`); d.toISOString().slice(0, 10) <= until; d.setUTCDate(d.getUTCDate() + 1)) {
+    out.push(d.toISOString().slice(0, 10));
+    if (out.length > 60) break; // guard against a typo'd range
+  }
+  return out;
+}
+
+/** "Wed, Nov 25" */
+export function shortDay(iso: string): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+}
+
 /** "Thursday, November 26" */
 export function formatDay(iso: string): string {
   return new Date(`${iso}T12:00:00`).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });

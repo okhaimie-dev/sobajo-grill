@@ -30,6 +30,11 @@ export interface MenuItem {
   campaignOnly?: boolean;
   /** Can't be delivered: the cart switches to pickup and checkout refuses delivery. */
   pickupOnly?: boolean;
+  /**
+   * Only these pickup days (YYYY-MM-DD). Set by lib/content.ts for a
+   * campaign-only item from its campaign's first/last pickup day.
+   */
+  pickupDates?: string[];
   /** Side choices for this item (name, extra price), filled in by `withSides`. */
   sides?: [string, number][];
   /** Sold out / coming soon: listed with that label, not orderable. Default available. */
@@ -59,8 +64,20 @@ export interface CartLine {
   price: number;
   side: string;
   notes: string;
-  /** Copied from the item so the cart can force pickup. */
+  /** Copied from the item so the cart can force pickup (and pickup days). */
   pickupOnly?: boolean;
+  pickupDates?: string[];
+}
+
+/**
+ * Pickup days allowed for an order (YYYY-MM-DD, today or later in Baltimore):
+ * the days every restricted line shares. null when no line restricts them; an
+ * empty list when they don't overlap or have all passed.
+ */
+export function allowedPickupDays(lists: (string[] | undefined)[], today: string): string[] | null {
+  const restricted = lists.filter((l): l is string[] => Boolean(l?.length));
+  if (!restricted.length) return null;
+  return restricted.reduce((acc, l) => acc.filter((d) => l.includes(d))).filter((d) => d >= today);
 }
 
 // Delivery is fulfilled by DoorDash: no order minimum, and the delivery fee

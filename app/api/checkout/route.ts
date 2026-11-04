@@ -1,6 +1,7 @@
 import { BASE_PATH } from "@/lib/assets";
 import { getMenu } from "@/lib/content";
-import { MenuItem, sideOptions } from "@/lib/menu";
+import { shortDay, todayInBaltimore } from "@/lib/campaigns";
+import { MenuItem, allowedPickupDays, sideOptions } from "@/lib/menu";
 import { SquareLineItem, createPaymentLink, squareConfigured } from "@/lib/square";
 
 /**
@@ -73,6 +74,16 @@ export async function POST(request: Request) {
   const address = str(body.address, 300);
   if (isDelivery && !address) return json(400, { error: "Please enter a delivery address." });
   const time = str(body.time, 40);
+
+  // Campaign items (e.g. the Thanksgiving turkey) can only be picked up on their days.
+  const ordered = rawLines.map((raw) => items.find((i) => i.name === (raw as Record<string, unknown>)?.name));
+  const days = allowedPickupDays(ordered.map((i) => i?.pickupDates), todayInBaltimore());
+  if (days) {
+    if (!days.length) return json(400, { error: "The pickup days for an item in your cart have passed — please remove it." });
+    if (!days.includes(time.slice(0, 10))) {
+      return json(400, { error: `Please choose a pickup day: ${days.map(shortDay).join(" or ")}.` });
+    }
+  }
 
   const paymentNote = [
     isDelivery ? `DELIVERY to ${address}` : "PICKUP",

@@ -19,7 +19,7 @@
 import { cache } from "react";
 import type { SanityImageSource } from "@sanity/image-url";
 import { sanityConfigured } from "@/sanity/env";
-import { CAMPAIGNS, Campaign, activeCampaign, findCampaign } from "./campaigns";
+import { CAMPAIGNS, Campaign, activeCampaign, daysBetween, findCampaign } from "./campaigns";
 import { CATERING_FAQS, FAQS } from "./faq";
 import { ItemStatus, MenuItem, MenuSection, SECTION_DEFS, SectionLayout, buildSections, items as SEED_ITEMS, withSides } from "./menu";
 import { imageBase, sanity } from "./sanity";
@@ -184,9 +184,24 @@ function seedContent(): Content {
   };
 }
 
+/**
+ * Campaign-only items (e.g. the Thanksgiving turkey) can only be picked up on
+ * their campaign's pickup days; the cart and checkout enforce it.
+ */
+function withPickupDays(content: Content): Content {
+  const days = new Map<string, string[]>();
+  for (const c of content.campaigns) {
+    if (!c.pickupFrom) continue;
+    const range = daysBetween(c.pickupFrom, c.pickupUntil ?? c.eventDate ?? c.pickupFrom);
+    for (const name of c.featured) days.set(name, range);
+  }
+  const items = content.items.map((i) => (i.campaignOnly && days.has(i.name) ? { ...i, pickupDates: days.get(i.name) } : i));
+  return { ...content, items };
+}
+
 /** All site content, deduplicated per request and cached across requests by tag. */
 export const getContent = cache(async (): Promise<Content> => {
-  if (!sanityConfigured) return seedContent();
+  if (!sanityConfigured) return withPickupDays(seedContent());
   const raw = await sanity.fetch<Raw>(
     QUERY,
     {},
@@ -198,9 +213,9 @@ export const getContent = cache(async (): Promise<Content> => {
   );
   if (!raw.site) {
     console.warn("[content] Sanity has no Business info yet — using seed content (run `npm run sanity:import`)");
-    return seedContent();
+    return withPickupDays(seedContent());
   }
-  return normalize(raw);
+  return withPickupDays(normalize(raw));
 });
 
 export const getSite = async () => (await getContent()).site;
