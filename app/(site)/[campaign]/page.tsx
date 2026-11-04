@@ -12,6 +12,7 @@ import JsonLd from "@/components/json-ld";
 import LeadForm from "@/components/lead-form";
 import { DishCard, FeatureDish, ListRows, Tiers } from "@/components/menu-items";
 import PageHero from "@/components/page-hero";
+import { STOCK_BADGE, getStock } from "@/lib/stock";
 
 /**
  * One landing page per campaign in Sanity. Known ones are prerendered at
@@ -45,8 +46,25 @@ export default async function CampaignPage({ params }: Props) {
   const c = campaigns.find((x) => x.slug === slug);
   if (!c) notFound();
 
-  const featured = menuItems(items, c.featured);
   const sides = menuItems(items, c.sides);
+  // Limited dishes (order limit in Sanity): scarcity badge from the paid count, Sold out at the limit.
+  const featured = await Promise.all(
+    menuItems(items, c.featured).map(async (item) => {
+      const stock = await getStock(item);
+      if (!stock) return item;
+      if (stock.level === "soldOut") return { ...item, status: "soldOut" as const, available: false };
+      const badge = STOCK_BADGE[stock.level];
+      return badge ? { ...item, badge } : item;
+    })
+  );
+  const online = Boolean(c.orderOnline);
+  const soldOut = online && featured.length > 0 && featured.every((i) => i.available === false);
+  // Where the main buttons go: the dish (pay online), the waitlist (sold out) or the request form.
+  const action = !online
+    ? { href: "#preorder", label: "Pre-order now" }
+    : soldOut
+      ? { href: "#preorder", label: "Join the waitlist" }
+      : { href: "#menu-picks", label: "Order now" };
   const platters = sectionById(sections, "ndokoti");
   const heroSrc = c.hero.image.startsWith("http") ? `${c.hero.image}&w=1600` : asset(c.hero.image);
   const faqs = c.orderBy
@@ -74,12 +92,18 @@ export default async function CampaignPage({ params }: Props) {
         image={{ src: heroSrc, alt: c.hero.imageAlt }}
       >
         <div className="hero-actions">
-          <a className="btn btn-primary" href="#preorder">
-            Pre-order now <Icon name="arrow" />
+          <a className="btn btn-primary" href={action.href}>
+            {action.label} <Icon name="arrow" />
           </a>
-          <a className="btn btn-ghost" href="#menu-picks">
-            See the menu
-          </a>
+          {online && !soldOut ? (
+            <a className="btn btn-ghost" href="#preorder">
+              How it works
+            </a>
+          ) : (
+            <a className="btn btn-ghost" href="#menu-picks">
+              See the menu
+            </a>
+          )}
         </div>
         <div className="hero-meta">
           {c.eventDate && (
@@ -131,7 +155,11 @@ export default async function CampaignPage({ params }: Props) {
               </h2>
             </div>
             <p className="section-lede">
-              {featured.length + sides.length > 1 ||
+              {online
+                ? soldOut
+                  ? "We've sold out for this year — join the waitlist below and we'll text you first if we can make more."
+                  : "Add it to your order, choose your pickup day and pay securely online. Quantities are limited."
+                : featured.length + sides.length > 1 ||
               featured.some((i) => i.variations.length > 1 || i.sideMode)
                 ? "Add dishes to your order, pick sizes and sides — then send your pre-order request below and we'll confirm everything with you."
                 : "Send your pre-order request below and we'll confirm your order, pickup day and payment with you."}
@@ -176,13 +204,24 @@ export default async function CampaignPage({ params }: Props) {
       <section className="section section-alt" id="preorder" aria-labelledby="preorder-title">
         <div className="container quote-grid">
           <div>
-            <div className="eyebrow">Pre-order</div>
+            <div className="eyebrow">{online ? (soldOut ? "Waitlist" : "How it works") : "Pre-order"}</div>
             <h2 className="section-title" id="preorder-title">
-              Reserve your <em>{c.name} spread.</em>
+              {online && soldOut ? (
+                <>
+                  Sold out — <em>for now.</em>
+                </>
+              ) : (
+                <>
+                  Reserve your <em>{c.name} {online ? "order" : "spread"}.</em>
+                </>
+              )}
             </h2>
             <p className="section-lede" style={{ marginTop: 16 }}>
-              Send your request and we&apos;ll call or text to confirm your order, pickup time and
-              payment. Prefer to talk? Call{" "}
+              {online
+                ? soldOut
+                  ? "Every one has been claimed. Leave your details and if we can make more, you'll be the first to know. Questions? Call "
+                  : "Order and pay online in a minute — your receipt is your confirmation. Questions? Call "
+                : "Send your request and we'll call or text to confirm your order, pickup time and payment. Prefer to talk? Call "}
               <a href={`tel:${site.phoneE164}`} style={{ color: "var(--gold)", fontWeight: 700 }}>
                 {site.phone}
               </a>
@@ -216,7 +255,37 @@ export default async function CampaignPage({ params }: Props) {
             </dl>
           </div>
           <div className="quote-card" data-hide-fab>
-            <LeadForm kind="preorder" campaign={c.slug} minDate={c.pickupFrom} maxDate={c.pickupUntil ?? c.eventDate} delivery={c.delivery} />
+            {!online ? (
+              <LeadForm kind="preorder" campaign={c.slug} minDate={c.pickupFrom} maxDate={c.pickupUntil ?? c.eventDate} delivery={c.delivery} />
+            ) : soldOut ? (
+              <LeadForm kind="campaignWaitlist" campaign={c.slug} />
+            ) : (
+              <>
+                <ol className="ship-steps order-steps" aria-label="How ordering works">
+                  <li>
+                    <strong>Add to order</strong>
+                    <span>{featured.map((i) => i.name).join(", ")}</span>
+                  </li>
+                  <li>
+                    <strong>Choose your pickup day</strong>
+                    <span>{c.pickupWindows?.length ? c.pickupWindows.join(" or ") : "Confirmed with your order"}</span>
+                  </li>
+                  <li>
+                    <strong>Pay securely</strong>
+                    <span>Square checkout — your receipt is your confirmation</span>
+                  </li>
+                  <li>
+                    <strong>Pick up</strong>
+                    <span>
+                      {site.address.street}, {site.address.city}
+                    </span>
+                  </li>
+                </ol>
+                <a className="btn btn-primary btn-block" href="#menu-picks" style={{ marginTop: 20 }}>
+                  {action.label} <Icon name="arrow" />
+                </a>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -237,8 +306,8 @@ export default async function CampaignPage({ params }: Props) {
             <h2 id="campaign-cta-title">{c.cta.title}</h2>
             <p>{c.cta.text}</p>
             <div className="hero-actions">
-              <a className="btn btn-dark" href="#preorder">
-                Pre-order now <Icon name="arrow" />
+              <a className="btn btn-dark" href={action.href}>
+                {action.label} <Icon name="arrow" />
               </a>
               <a className="btn btn-ghost" href={`tel:${site.phoneE164}`}>
                 <Icon name="phone" /> {site.phone}

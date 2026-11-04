@@ -60,13 +60,31 @@ with their Sanity account; invite them at sanity.io/manage → project
 1. **CORS origins** → add `http://localhost:3000`,
    `https://sobajo-grill.vercel.app` (and `https://sobajogrill.com` later),
    each with **Allow credentials** ticked — needed for the Studio to log in.
-2. **Webhooks** → Create: URL `https://sobajo-grill.vercel.app/api/revalidate`,
+2. **Webhooks** → Create: URL `https://sobajo-grill.vercel.app/api/revalidate/`
+   (keep the trailing slash — without it the site answers with a redirect),
    dataset `production`, trigger on Create/Update/Delete, filter empty,
    HTTP method POST, **Secret** = the value of `SANITY_REVALIDATE_SECRET`.
 3. **Vercel** → Settings → Environment Variables: add
    `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`,
    `NEXT_PUBLIC_SANITY_API_VERSION` and `SANITY_REVALIDATE_SECRET`. Not the
    write token — the site only reads public content.
+
+### Limited campaign items (Thanksgiving turkeys)
+
+- **Order limit** on a menu item (e.g. 100) stops sales once that many are
+  paid. Paid quantities are counted from Square orders since the campaign's
+  banner start (`lib/stock.ts`); guests never see the number — only
+  *Selling fast* (60%), *Almost gone* (90%), then *Sold out* with a
+  **waitlist** form (→ CRM). Raise the limit in the Studio to reopen sales.
+  Two guests paying at the same moment at the limit can land 1–2 over.
+- **Customers pay online** on a campaign → guests add the dish to the cart,
+  must pick one of the campaign's pickup days, and pay on Square. The
+  campaign page shows "How it works" instead of a pre-order request form.
+- **Square webhook** → `/api/square-webhook/` (subscription
+  `payment.updated`, signature key in `SQUARE_WEBHOOK_SIGNATURE_KEY`): each
+  completed payment for a campaign item refreshes the count and records a
+  "<Campaign> order · PAID" opportunity in Twenty (customer, pickup day,
+  items, Square order ref) — once per order, even when Square retries.
 
 ## What's included
 

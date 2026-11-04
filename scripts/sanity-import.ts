@@ -137,6 +137,7 @@ async function main() {
       offeredAsSide: item.offeredAsSide ?? false,
       campaignOnly: item.campaignOnly ?? false,
       pickupOnly: item.pickupOnly ?? false,
+      ...(item.orderLimit && { orderLimit: item.orderLimit }),
       ...(item.includes && { includes: item.includes }),
       sortOrder: n * 10,
     });
@@ -170,6 +171,7 @@ async function main() {
       sides: refs(c.sides),
       showPlatters: c.showPlatters,
       delivery: c.delivery,
+      orderOnline: c.orderOnline ?? false,
       seo: c.seo,
       og: c.og,
     });

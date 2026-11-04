@@ -3,6 +3,7 @@ import { getMenu } from "@/lib/content";
 import { shortDay, todayInBaltimore } from "@/lib/campaigns";
 import { MenuItem, allowedPickupDays, sideOptions } from "@/lib/menu";
 import { SquareLineItem, createPaymentLink, squareConfigured } from "@/lib/square";
+import { getStock } from "@/lib/stock";
 
 /**
  * POST /api/checkout — turns the cart into a Square hosted checkout link.
@@ -64,6 +65,19 @@ export async function POST(request: Request) {
       unitPrice: variation[1] + (side?.[1] ?? 0),
       note,
     });
+  }
+
+  // Limited items (e.g. 100 turkeys): stop at the limit. The count is never revealed.
+  for (const item of new Set(lineItems.map((l) => items.find((i) => i.name === l.name)!))) {
+    const stock = await getStock(item);
+    if (!stock || stock.sold === null) continue;
+    const wanted = lineItems.filter((l) => l.name === item.name).reduce((n, l) => n + l.quantity, 0);
+    if (stock.sold >= stock.limit) {
+      return json(409, { error: `Sorry — ${item.name} is sold out. Join the waitlist on the page and we'll text you if more open up.` });
+    }
+    if (stock.sold + wanted > stock.limit) {
+      return json(409, { error: `We don't have that many ${item.name}s left — please lower the quantity.` });
+    }
   }
 
   const isDelivery = body.fulfillment === "delivery";

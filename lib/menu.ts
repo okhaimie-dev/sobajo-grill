@@ -35,6 +35,10 @@ export interface MenuItem {
    * campaign-only item from its campaign's first/last pickup day.
    */
   pickupDates?: string[];
+  /** Stop selling once this many are paid (Square count, see lib/stock.ts). */
+  orderLimit?: number;
+  /** Count paid orders created since (ISO); set from the item's campaign. */
+  countSince?: string;
   /** Side choices for this item (name, extra price), filled in by `withSides`. */
   sides?: [string, number][];
   /** Sold out / coming soon: listed with that label, not orderable. Default available. */
@@ -129,7 +133,7 @@ export const items: MenuItem[] = [
   { section: "grill", name: "Obasanjo Fire Chicken", badge: "Signature", description: "A tribute to our Nigerian community and the customers who helped shape the Sobajo journey—farm-raised chicken, fire-grilled with bold spice, heat, onions, and unmistakable Sobajo character.", image: U("photo-1532550907401-a500c9a57435"), variations: [["Full Chicken", 25]], available: true },
   { section: "grill", name: "BBQ Chicken", description: "Sobajo BBQ Chicken celebrates the barbecue side of our story—fire, smoke, char, and the joy of sharing grilled chicken around the table. It brings familiar American barbecue comfort together with Sobajo’s bold African personality, creating a simple, smoky meal made for family, friends, and gatherings.", image: U("photo-1598103442097-8b74394b95c6"), variations: [["Half Chicken", 12], ["Full Chicken", 20]], available: true },
   { section: "grill", name: "Sobajo Smoked Turkey Wings", badge: "Back by demand", description: "Back by popular demand. Our customers asked for them, so Sobajo Smoked Turkey Wings return with rich smoke, bold seasoning, and hearty fire-grilled character.", image: U("photo-1518492104633-130d0cc84637"), variations: [["2 Full Wings", 15]], available: true },
-  { section: "grill", name: "Sobajo Smoked Whole Turkey", campaignOnly: true, pickupOnly: true, description: "A whole turkey, smoked and fire-finished the Sobajo way — the centerpiece for your Thanksgiving table. Pre-order for pickup.", image: U("photo-1518492104633-130d0cc84637"), variations: [["Whole Turkey", 100]], available: true },
+  { section: "grill", name: "Sobajo Smoked Whole Turkey", campaignOnly: true, pickupOnly: true, orderLimit: 100, description: "A whole turkey, smoked and fire-finished the Sobajo way — the centerpiece for your Thanksgiving table. Pre-order for pickup.", image: U("photo-1518492104633-130d0cc84637"), variations: [["Whole Turkey", 100]], available: true },
   { section: "grill", name: "Sobajo Fire Wings", description: "Our tribute to Baltimore and America’s love of great wings—bringing Sobajo’s bold African flavors together with a familiar American favorite. Made for game nights, celebrations, family, and friends. Sides are optional and sold separately.", image: U("photo-1562967914-608f82629710"), variations: [["4 Full Wings", 12], ["8 Full Wings", 24], ["20 Full Wings", 50]], sideMode: "optional", available: true },
   { section: "grill", name: "Fire-Grilled Fish", badge: "Side included", description: "Fire-Grilled Fish reflects the place grilled fish holds in African food culture and communal dining. Tilapia or Pompano is cooked over fire, served with onions, Sobajo hot sauce, and one included side—an experience built around spice, smoke, sharing, and the table. No suya spice.", image: U("photo-1519708227418-c8fd9a32b7a2"), variations: [["Whole Tilapia", 25], ["Whole Pompano", 25]], sideMode: "included", available: true },
   { section: "ndokoti", name: "Ndokoti Classic", description: "Signature Beef Brisket Suya with jollof rice, fried plantains, fresh onions, and Sobajo hot sauce.", includes: ["Beef Brisket Suya", "Jollof rice", "Fried plantains", "Onions & Sobajo hot sauce"], variations: [["Serves 1–2", 50]], available: true },

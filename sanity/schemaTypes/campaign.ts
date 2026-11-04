@@ -77,6 +77,15 @@ export const campaign = defineType({
       group: "basics",
       initialValue: false,
     }),
+    defineField({
+      name: "orderOnline",
+      title: "Customers pay online",
+      description:
+        "On → guests add featured dishes to the cart and pay (Square); paid orders go to the CRM automatically. Off → the page shows a pre-order request form instead and staff confirm by phone.",
+      type: "boolean",
+      group: "basics",
+      initialValue: false,
+    }),
     defineField({ name: "eventDate", title: "Event / holiday date", type: "date", group: "basics" }),
     defineField({ name: "orderBy", title: "Last day to pre-order", description: "Hidden on the page until set.", type: "date", group: "basics" }),
     defineField({

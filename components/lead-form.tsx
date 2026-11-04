@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { track } from "@/lib/analytics";
 import { getAttribution } from "@/lib/attribution";
-import type { LeadKind } from "@/lib/leads/schema";
+import type { FormLeadKind } from "@/lib/leads/schema";
 import { BASE_PATH } from "@/lib/assets";
 import { money } from "@/lib/menu";
 import { cateringQuoteHref } from "@/lib/site";
@@ -13,7 +13,7 @@ import { useCart } from "./cart-context";
 import { useSite } from "./site-context";
 import { Icon } from "./icons";
 
-const COPY: Record<LeadKind, { button: string; done: string; doneText: string }> = {
+const COPY: Record<FormLeadKind, { button: string; done: string; doneText: string }> = {
   catering: {
     button: "Send my request",
     done: "Request received!",
@@ -23,6 +23,11 @@ const COPY: Record<LeadKind, { button: string; done: string; doneText: string }>
     button: "Send my pre-order request",
     done: "Pre-order request received!",
     doneText: "We'll call or text to confirm your order, pickup time and payment.",
+  },
+  campaignWaitlist: {
+    button: "Join the waitlist",
+    done: "You're on the waitlist.",
+    doneText: "If we can make more, we'll text you first.",
   },
   waitlist: {
     button: "Join the shipping list",
@@ -47,7 +52,7 @@ export default function LeadForm({
   maxDate,
   delivery = true,
 }: {
-  kind: LeadKind;
+  kind: FormLeadKind;
   compact?: boolean;
   /** Campaign slug (pre-orders). */
   campaign?: string;
@@ -121,7 +126,22 @@ export default function LeadForm({
         </label>
       </div>
 
-      {kind === "preorder" ? (
+      {kind === "campaignWaitlist" ? (
+        <div className="lead-grid">
+          <label className="field">
+            <span className="field-label">Name *</span>
+            <input className="input" name="name" required autoComplete="name" />
+          </label>
+          <label className="field">
+            <span className="field-label">Phone *</span>
+            <input className="input" name="phone" type="tel" required autoComplete="tel" placeholder="(443) 555-0123" />
+          </label>
+          <label className="field lead-wide">
+            <span className="field-label">Email *</span>
+            <input className="input" name="email" type="email" required autoComplete="email" />
+          </label>
+        </div>
+      ) : kind === "preorder" ? (
         <div className="lead-grid">
           <label className="field">
             <span className="field-label">Name *</span>

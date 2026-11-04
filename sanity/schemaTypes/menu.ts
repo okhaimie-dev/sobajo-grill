@@ -181,6 +181,14 @@ export const menuItem = defineType({
       initialValue: false,
     }),
     defineField({
+      name: "orderLimit",
+      title: "Order limit",
+      description:
+        "Stop taking orders once this many are paid (e.g. 100 turkeys). Guests never see the number — only “Selling fast” (60%), “Almost gone” (90%), then Sold out + a waitlist. Raise it to reopen sales. Leave empty for no limit.",
+      type: "number",
+      validation: (r) => r.integer().min(1),
+    }),
+    defineField({
       name: "includes",
       title: "What this tier adds",
       description: "Ndokoti platters only: what this level adds on top of the one before.",

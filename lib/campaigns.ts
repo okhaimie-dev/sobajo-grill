@@ -38,6 +38,8 @@ export interface Campaign {
   og: { line1: string; line2: string };
   /** DoorDash delivery offered for this campaign; false → pickup only (page copy follows). */
   delivery: boolean;
+  /** Guests pay online via the cart (paid orders → CRM); false → pre-order request form. */
+  orderOnline?: boolean;
   /** Main dishes, by exact menu name. */
   featured: string[];
   /** Ndokoti platters block. */
@@ -78,6 +80,7 @@ export const CAMPAIGNS: Campaign[] = [
     },
     og: { line1: "Thanksgiving,", line2: "off the fire." },
     delivery: false,
+    orderOnline: true,
     featured: ["Sobajo Smoked Whole Turkey"],
     showPlatters: false,
     sides: [],
@@ -100,7 +103,11 @@ export const CAMPAIGNS: Campaign[] = [
     faqs: [
       {
         q: "How do I pre-order for Thanksgiving?",
-        a: "Send a pre-order request on this page with your preferred pickup day — Wednesday, Nov 25 or Thanksgiving Day, Nov 26. We'll confirm the details and payment with you directly.",
+        a: "Tap Order now, add the turkey, choose your pickup day — Wednesday, Nov 25 or Thanksgiving Day, Nov 26 — and pay securely online. Your receipt is your confirmation.",
+      },
+      {
+        q: "What if they sell out?",
+        a: "We smoke a limited number of turkeys each year. If they're gone, join the waitlist on this page and we'll text you first if we can make more.",
       },
       {
         q: "Can I get my Thanksgiving order delivered?",

@@ -46,7 +46,7 @@ const QUERY = /* groq */ `{
     _id, title, tab, "id": anchor.current, layout, note
   },
   "items": *[_type == "menuItem" && defined(section._ref)] | order(sortOrder asc, name asc) {
-    name, description, badge, includes, sideMode, offeredAsSide, campaignOnly, pickupOnly,
+    name, description, badge, includes, sideMode, offeredAsSide, campaignOnly, pickupOnly, orderLimit,
     "status": coalesce(status, "available"),
     "sectionRef": section._ref,
     "variations": variations[defined(label) && defined(price)]{ label, price },
@@ -54,7 +54,7 @@ const QUERY = /* groq */ `{
   },
   "campaigns": *[_type == "campaign" && defined(slug.current)] | order(bannerFrom desc) {
     name, "slug": slug.current, bannerFrom, bannerUntil, bannerText, bannerShort,
-    eventDate, orderBy, pickupWindows, pickupFrom, pickupUntil, seo, hero, og, showPlatters, reasons, cta, faqs, delivery,
+    eventDate, orderBy, pickupWindows, pickupFrom, pickupUntil, seo, hero, og, showPlatters, reasons, cta, faqs, delivery, orderOnline,
     "featured": featured[]->name, "sides": sides[]->name
   },
   "faqs": *[_type == "faq"] | order(sortOrder asc) { page, "q": question, "a": answer },
@@ -77,7 +77,7 @@ interface Raw {
   items: {
     name: string; description?: string; badge?: string; includes?: string[];
     sideMode?: "none" | "optional" | "included"; offeredAsSide?: boolean; status?: ItemStatus;
-    campaignOnly?: boolean; pickupOnly?: boolean;
+    campaignOnly?: boolean; pickupOnly?: boolean; orderLimit?: number;
     sectionRef: string; variations?: { label: string; price: number }[]; image?: SanityImage;
   }[];
   campaigns: (Omit<Campaign, "hero" | "featured" | "sides" | "reasons" | "faqs" | "pickupWindows" | "orderBy"> & {
@@ -135,6 +135,7 @@ function normalize(raw: Raw): Content {
         offeredAsSide: i.offeredAsSide ?? false,
         campaignOnly: i.campaignOnly ?? false,
         pickupOnly: i.pickupOnly ?? false,
+        orderLimit: i.orderLimit || undefined,
         status: i.status ?? "available",
         available: (i.status ?? "available") === "available",
       }))
@@ -155,6 +156,7 @@ function normalize(raw: Raw): Content {
       sides: names(c.sides),
       showPlatters: c.showPlatters ?? false,
       delivery: c.delivery ?? false,
+      orderOnline: c.orderOnline ?? false,
       reasons: (c.reasons ?? []).map((r) => ({ ...r, icon: r.icon as IconName })),
       faqs: c.faqs ?? [],
     }));
@@ -185,17 +187,19 @@ function seedContent(): Content {
 }
 
 /**
- * Campaign-only items (e.g. the Thanksgiving turkey) can only be picked up on
- * their campaign's pickup days; the cart and checkout enforce it.
+ * Campaign-only items (e.g. the Thanksgiving turkey) take rules from their
+ * campaign: pickup only on its pickup days (cart + checkout enforce it), and
+ * an order limit counted from the campaign's start (lib/stock.ts).
  */
 function withPickupDays(content: Content): Content {
-  const days = new Map<string, string[]>();
+  const rules = new Map<string, Pick<MenuItem, "pickupDates" | "countSince">>();
   for (const c of content.campaigns) {
-    if (!c.pickupFrom) continue;
-    const range = daysBetween(c.pickupFrom, c.pickupUntil ?? c.eventDate ?? c.pickupFrom);
-    for (const name of c.featured) days.set(name, range);
+    const pickupDates = c.pickupFrom ? daysBetween(c.pickupFrom, c.pickupUntil ?? c.eventDate ?? c.pickupFrom) : undefined;
+    // Banner start, Baltimore time: orders before the campaign don't count toward its limit.
+    const countSince = `${c.bannerFrom}T00:00:00-05:00`;
+    for (const name of c.featured) rules.set(name, { pickupDates, countSince });
   }
-  const items = content.items.map((i) => (i.campaignOnly && days.has(i.name) ? { ...i, pickupDates: days.get(i.name) } : i));
+  const items = content.items.map((i) => (i.campaignOnly && rules.has(i.name) ? { ...i, ...rules.get(i.name) } : i));
   return { ...content, items };
 }
 

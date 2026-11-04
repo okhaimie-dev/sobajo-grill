@@ -67,14 +67,35 @@ async function findOrCreatePerson(lead: Lead): Promise<string> {
   return created.data.createPerson.id;
 }
 
+/** Order reference in opportunity names, e.g. "#Q7Z2K9". */
+const orderRef = (id: string) => `#${id.slice(-6).toUpperCase()}`;
+
+/** A paid order already recorded? (Square retries webhooks; payments update more than once.) */
+export async function orderRecorded(orderId: string): Promise<boolean> {
+  const filter = encodeURIComponent(`name[like]:"%${orderRef(orderId)}%"`);
+  const found = await twenty<{ data: { opportunities: { id: string }[] } }>(`opportunities?filter=${filter}&limit=1&fields=id`);
+  return found.data.opportunities.length > 0;
+}
+
 export async function sendToTwenty(lead: Lead): Promise<void> {
   const personId = await findOrCreatePerson(lead);
 
   let opportunityId: string | undefined;
-  if (lead.kind === "catering" || lead.kind === "preorder") {
-    const label = lead.kind === "preorder" ? `${lead.campaignName ?? "Campaign"} pre-order` : "Catering";
-    const date = lead.kind === "preorder" ? lead.pickupDate : lead.eventDate;
-    const parts = [lead.name, date ?? "date TBD", lead.guests ? `${lead.guests} guests` : null].filter(Boolean);
+  if (lead.kind === "catering" || lead.kind === "preorder" || lead.kind === "order" || lead.kind === "campaignWaitlist") {
+    const label = {
+      catering: "Catering",
+      preorder: `${lead.campaignName ?? "Campaign"} pre-order`,
+      order: `${lead.campaignName ?? "Campaign"} order · PAID`,
+      campaignWaitlist: `${lead.campaignName ?? "Campaign"} waitlist`,
+    }[lead.kind];
+    const date = lead.kind === "catering" ? lead.eventDate : lead.pickupDate;
+    const parts = [
+      lead.name,
+      lead.kind === "campaignWaitlist" ? null : (date ?? "date TBD"),
+      lead.guests ? `${lead.guests} guests` : null,
+      lead.amount !== undefined ? `$${lead.amount.toFixed(2)}` : null,
+      lead.orderId ? orderRef(lead.orderId) : null,
+    ].filter(Boolean);
     const opp = await twenty<Created<"createOpportunity">>("opportunities", {
       method: "POST",
       body: { name: `${label} · ${parts.join(" · ")}`, pointOfContactId: personId },

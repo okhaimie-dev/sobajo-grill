@@ -7,14 +7,19 @@
 import type { Attribution, Touch } from "@/lib/attribution";
 import { type Campaign, findCampaign } from "@/lib/campaigns";
 
-export const LEAD_KINDS = ["catering", "preorder", "waitlist", "newsletter"] as const;
-export type LeadKind = (typeof LEAD_KINDS)[number];
+/** Kinds a website form can submit. */
+export const LEAD_KINDS = ["catering", "preorder", "campaignWaitlist", "waitlist", "newsletter"] as const;
+export type FormLeadKind = (typeof LEAD_KINDS)[number];
+/** + "order": a paid Square order, recorded by /api/square-webhook (never from a form). */
+export type LeadKind = FormLeadKind | "order";
 
 export const LEAD_LABELS: Record<LeadKind, string> = {
   catering: "Catering request",
   preorder: "Pre-order request",
+  campaignWaitlist: "Waitlist",
   waitlist: "Shipping waitlist",
   newsletter: "Newsletter signup",
+  order: "Paid pre-order",
 };
 
 export interface Lead {
@@ -35,6 +40,9 @@ export interface Lead {
   pickupDate?: string;
   /** Cart lines the guest had when they sent a pre-order (informational). */
   items?: string[];
+  /** Paid orders: Square order id (dedupes webhook retries) and total in dollars. */
+  orderId?: string;
+  amount?: number;
   /** Path the form was submitted from. */
   page?: string;
   attribution: Attribution;
@@ -64,7 +72,7 @@ export function parseLead(body: unknown, campaigns: Campaign[], today = new Date
   if (!body || typeof body !== "object") return "Invalid request.";
   const b = body as Record<string, unknown>;
 
-  const kind = b.kind as LeadKind;
+  const kind = b.kind as FormLeadKind;
   if (!LEAD_KINDS.includes(kind)) return "Invalid request.";
 
   const email = str(b.email, 254)?.toLowerCase();
@@ -84,6 +92,14 @@ export function parseLead(body: unknown, campaigns: Campaign[], today = new Date
     },
   };
 
+  if (kind === "campaignWaitlist") {
+    if (!lead.name) return "Please tell us your name.";
+    if (!lead.phone) return "Please add a phone number so we can text you if more open up.";
+    const campaign = findCampaign(campaigns, str(b.campaign, 60) ?? "");
+    if (!campaign) return "Invalid request.";
+    lead.campaign = campaign.slug;
+    lead.campaignName = campaign.name;
+  }
   if (kind === "preorder") {
     if (!lead.name) return "Please tell us your name.";
     if (!lead.phone) return "Please add a phone number so we can confirm your order.";
@@ -131,6 +147,8 @@ export function leadMarkdown(lead: Lead): string {
     ["Email", lead.email],
     ["Phone", lead.phone],
     ["Campaign", lead.campaignName],
+    ["Square order", lead.orderId],
+    ["Paid", lead.amount !== undefined ? `$${lead.amount.toFixed(2)}` : undefined],
     ["Pickup date", lead.pickupDate],
     ["Event date", lead.eventDate],
     ["Guests", lead.guests],
@@ -138,7 +156,9 @@ export function leadMarkdown(lead: Lead): string {
     ["Submitted from", lead.page],
   ];
   const lines = rows.filter(([, v]) => v !== undefined && v !== "").map(([k, v]) => `- **${k}:** ${v}`);
-  if (lead.items?.length) lines.push("", "**Cart at time of request**", "", ...lead.items.map((i) => `- ${i}`));
+  if (lead.items?.length) {
+    lines.push("", lead.kind === "order" ? "**Order**" : "**Cart at time of request**", "", ...lead.items.map((i) => `- ${i}`));
+  }
   if (lead.message) lines.push("", "**Message**", "", lead.message);
 
   const fmt = (t?: Touch) =>
