@@ -46,7 +46,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // suppressHydrationWarning: browser extensions add attributes to <html>
     // before React loads (applies to this element's attributes only).
-    <html lang="en-US" className={`${display.variable} ${body.variable}`} suppressHydrationWarning>
+    // data-scroll-behavior="smooth": globals.css scrolls smoothly; this tells
+    // Next 16 to switch that off while navigating, so a new page starts at its
+    // top instead of a smooth scroll stopping part-way down.
+    <html
+      lang="en-US"
+      className={`${display.variable} ${body.variable}`}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <body>{children}</body>
     </html>
   );
