@@ -37,6 +37,14 @@ interface CartContextValue {
   closeItem: () => void;
   addConfiguredItem: (item: MenuItem, cfg: CartConfig) => void;
   removeItem: (id: number) => void;
+  /** Change a line's quantity (1–99). */
+  setQuantity: (id: number, quantity: number) => void;
+  /**
+   * Fastest path to checkout: one-size, no-side items (e.g. the Thanksgiving
+   * turkey) go straight into the cart (once) and the cart opens; anything
+   * with choices opens the item customizer instead.
+   */
+  quickOrder: (item: MenuItem) => void;
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
@@ -142,6 +150,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setLines((prev) => prev.filter((l) => l.id !== id));
   }, []);
 
+  const setQuantity = useCallback((id: number, quantity: number) => {
+    const q = Math.min(99, Math.max(1, Math.round(quantity)));
+    setLines((prev) => prev.map((l) => (l.id === id ? { ...l, quantity: q, price: l.unitPrice * q } : l)));
+  }, []);
+
+  const quickOrder = useCallback(
+    (item: MenuItem) => {
+      if (item.variations.length !== 1 || item.sideMode) return configureItem(item);
+      const [variation, unitBasePrice] = item.variations[0];
+      if (!lines.some((l) => l.name === item.name && l.variation === variation)) {
+        addConfiguredItem(item, { variation, unitBasePrice, quantity: 1, side: "", sidePrice: 0, notes: "" });
+      }
+      setActiveItem(null);
+      setCartOpen(true);
+    },
+    [lines, configureItem, addConfiguredItem]
+  );
+
   const clearCart = useCallback(() => setLines([]), []);
 
   const openCart = useCallback(() => {
@@ -195,6 +221,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       closeItem,
       addConfiguredItem,
       removeItem,
+      setQuantity,
+      quickOrder,
       clearCart,
       openCart,
       closeCart,
@@ -211,6 +239,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       closeItem,
       addConfiguredItem,
       removeItem,
+      setQuantity,
+      quickOrder,
       clearCart,
       openCart,
       closeCart,

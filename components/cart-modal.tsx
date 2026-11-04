@@ -9,17 +9,27 @@ import { Icon } from "./icons";
 import { useDialog } from "./use-dialog";
 
 function CartItemRow({ line }: { line: CartLine }) {
-  const { removeItem } = useCart();
-  const details = [
-    line.variation + (line.quantity > 1 ? ` × ${line.quantity}` : ""),
-    line.side,
-    line.notes,
-  ].filter(Boolean);
+  const { removeItem, setQuantity } = useCart();
+  const details = [line.variation, line.side, line.notes].filter(Boolean);
   return (
     <li className="cart-line">
       <strong>{line.name}</strong>
       <span className="line-price">{money(line.price)}</span>
       <span className="meta">{details.join(" · ")}</span>
+      <div className="stepper stepper-sm" role="group" aria-label={`Quantity of ${line.name}`}>
+        <button
+          type="button"
+          onClick={() => setQuantity(line.id, line.quantity - 1)}
+          disabled={line.quantity <= 1}
+          aria-label="One fewer"
+        >
+          <Icon name="minus" />
+        </button>
+        <output aria-live="polite">{line.quantity}</output>
+        <button type="button" onClick={() => setQuantity(line.id, line.quantity + 1)} disabled={line.quantity >= 99} aria-label="One more">
+          <Icon name="plus" />
+        </button>
+      </div>
       <button className="link-btn" onClick={() => removeItem(line.id)} aria-label={`Remove ${line.name}`}>
         Remove
       </button>

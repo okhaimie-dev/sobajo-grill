@@ -53,8 +53,10 @@ export function DishCard({ item }: { item: MenuItem }) {
   );
 }
 
-export function FeatureDish({ item }: { item: MenuItem }) {
-  const { configureItem } = useCart();
+/** `quick`: Add goes straight to the cart and opens it (campaign pages). */
+export function FeatureDish({ item, quick = false }: { item: MenuItem; quick?: boolean }) {
+  const { configureItem, quickOrder } = useCart();
+  const add = () => (quick ? quickOrder(item) : configureItem(item));
   const img = itemImageProps(item, "(max-width: 900px) 100vw, 640px");
   const blocked = unavailableLabel(item);
   return (
@@ -69,14 +71,14 @@ export function FeatureDish({ item }: { item: MenuItem }) {
         <ul className="size-list" aria-label="Choose a size">
           {item.variations.map(([name, p], idx) => (
             <li key={name}>
-              <button type="button" disabled={Boolean(blocked)} onClick={() => configureItem(item, idx)} aria-label={`Add ${item.name}, ${name}, ${price(p)}`}>
+              <button type="button" disabled={Boolean(blocked)} onClick={() => (quick ? quickOrder(item) : configureItem(item, idx))} aria-label={`Add ${item.name}, ${name}, ${price(p)}`}>
                 {name}
                 <strong>{price(p)}</strong>
               </button>
             </li>
           ))}
         </ul>
-        <button className="add-btn" disabled={Boolean(blocked)} onClick={() => configureItem(item)}>
+        <button className="add-btn" disabled={Boolean(blocked)} onClick={add}>
           {blocked ?? (
             <>
               <Icon name="plus" /> Add to order

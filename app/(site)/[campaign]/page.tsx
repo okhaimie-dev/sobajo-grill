@@ -12,6 +12,7 @@ import JsonLd from "@/components/json-ld";
 import LeadForm from "@/components/lead-form";
 import { DishCard, FeatureDish, ListRows, Tiers } from "@/components/menu-items";
 import PageHero from "@/components/page-hero";
+import QuickOrderButton from "@/components/quick-order-button";
 import { STOCK_BADGE, getStock } from "@/lib/stock";
 
 /**
@@ -65,6 +66,16 @@ export default async function CampaignPage({ params }: Props) {
     : soldOut
       ? { href: "#preorder", label: "Join the waitlist" }
       : { href: "#menu-picks", label: "Order now" };
+  // One dish to buy (the turkey): "Order now" drops it in the cart and opens checkout.
+  const quickItem = online && !soldOut && featured.length === 1 ? featured[0] : null;
+  const OrderButton = ({ className }: { className: string }) =>
+    quickItem ? (
+      <QuickOrderButton item={quickItem} className={className} label={action.label} />
+    ) : (
+      <a className={className} href={action.href}>
+        {action.label} <Icon name="arrow" />
+      </a>
+    );
   const platters = sectionById(sections, "ndokoti");
   const heroSrc = c.hero.image.startsWith("http") ? `${c.hero.image}&w=1600` : asset(c.hero.image);
   const faqs = c.orderBy
@@ -92,9 +103,7 @@ export default async function CampaignPage({ params }: Props) {
         image={{ src: heroSrc, alt: c.hero.imageAlt }}
       >
         <div className="hero-actions">
-          <a className="btn btn-primary" href={action.href}>
-            {action.label} <Icon name="arrow" />
-          </a>
+          <OrderButton className="btn btn-primary" />
           {online && !soldOut ? (
             <a className="btn btn-ghost" href="#preorder">
               How it works
@@ -167,7 +176,7 @@ export default async function CampaignPage({ params }: Props) {
           </div>
           {featured.length === 1 ? (
             // One star dish (e.g. the Thanksgiving turkey): wide feature card, not a lone grid tile.
-            <FeatureDish item={featured[0]} />
+            <FeatureDish item={featured[0]} quick={Boolean(quickItem)} />
           ) : (
             <div className="menu-grid">
               {featured.map((i) => (
@@ -281,9 +290,9 @@ export default async function CampaignPage({ params }: Props) {
                     </span>
                   </li>
                 </ol>
-                <a className="btn btn-primary btn-block" href="#menu-picks" style={{ marginTop: 20 }}>
-                  {action.label} <Icon name="arrow" />
-                </a>
+                <div style={{ marginTop: 20, display: "grid" }}>
+                  <OrderButton className="btn btn-primary btn-block" />
+                </div>
               </>
             )}
           </div>
@@ -306,9 +315,7 @@ export default async function CampaignPage({ params }: Props) {
             <h2 id="campaign-cta-title">{c.cta.title}</h2>
             <p>{c.cta.text}</p>
             <div className="hero-actions">
-              <a className="btn btn-dark" href={action.href}>
-                {action.label} <Icon name="arrow" />
-              </a>
+              <OrderButton className="btn btn-dark" />
               <a className="btn btn-ghost" href={`tel:${site.phoneE164}`}>
                 <Icon name="phone" /> {site.phone}
               </a>
