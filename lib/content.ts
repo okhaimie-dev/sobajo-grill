@@ -23,6 +23,7 @@ import { CAMPAIGNS, Campaign, activeCampaign, findCampaign } from "./campaigns";
 import { CATERING_FAQS, FAQS } from "./faq";
 import { ItemStatus, MenuItem, MenuSection, SECTION_DEFS, SectionLayout, buildSections, items as SEED_ITEMS, withSides } from "./menu";
 import { imageBase, sanity } from "./sanity";
+import { SHIPPING_PRODUCTS, ShippingProduct } from "./shipping";
 import { SITE, Site, mapsUrlFor, phoneToE164 } from "./site";
 import type { IconName } from "@/components/icons";
 
@@ -34,6 +35,7 @@ export interface Content {
   sections: MenuSection[];
   campaigns: Campaign[];
   faqs: { home: Faq[]; catering: Faq[] };
+  shipping: ShippingProduct[];
 }
 
 export const CONTENT_TAG = "sanity";
@@ -55,7 +57,10 @@ const QUERY = /* groq */ `{
     eventDate, orderBy, pickupWindows, seo, hero, og, showPlatters, reasons, cta, faqs,
     "featured": featured[]->name, "sides": sides[]->name
   },
-  "faqs": *[_type == "faq"] | order(sortOrder asc) { page, "q": question, "a": answer }
+  "faqs": *[_type == "faq"] | order(sortOrder asc) { page, "q": question, "a": answer },
+  "shipping": *[_type == "shippingProduct" && defined(name)] | order(sortOrder asc, name asc) {
+    name, "text": coalesce(description, ""), "icon": coalesce(icon, "package"), "status": coalesce(status, "comingSoon")
+  }
 }`;
 
 type SanityImage = SanityImageSource & { asset?: { _ref: string }; hotspot?: { x: number; y: number } };
@@ -80,6 +85,7 @@ interface Raw {
     reasons?: Campaign["reasons"]; faqs?: Faq[]; pickupWindows?: string[]; orderBy?: string;
   })[];
   faqs: { page: "home" | "catering"; q: string; a: string }[];
+  shipping: ShippingProduct[];
 }
 
 const hasAsset = (img?: SanityImage): img is SanityImage => Boolean(img?.asset?._ref);
@@ -158,6 +164,7 @@ function normalize(raw: Raw): Content {
       home: raw.faqs.filter((f) => f.page === "home"),
       catering: raw.faqs.filter((f) => f.page === "catering"),
     },
+    shipping: raw.shipping,
   };
 }
 
@@ -169,6 +176,7 @@ function seedContent(): Content {
     sections: buildSections(SECTION_DEFS, items),
     campaigns: CAMPAIGNS,
     faqs: { home: FAQS, catering: CATERING_FAQS },
+    shipping: SHIPPING_PRODUCTS,
   };
 }
 
@@ -200,3 +208,4 @@ export const getCampaigns = async () => (await getContent()).campaigns;
 export const getCampaign = async (slug: string) => findCampaign(await getCampaigns(), slug);
 export const getActiveCampaign = async () => activeCampaign(await getCampaigns());
 export const getFaqs = async () => (await getContent()).faqs;
+export const getShipping = async () => (await getContent()).shipping;

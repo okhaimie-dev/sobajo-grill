@@ -1,12 +1,7 @@
-import { Icon, IconName } from "./icons";
+import { getShipping } from "@/lib/content";
+import { SHIPPING_STATUS_LABEL } from "@/lib/shipping";
+import { Icon } from "./icons";
 import LeadForm from "./lead-form";
-
-const PRODUCTS: { name: string; text: string; icon: IconName }[] = [
-  { name: "Sobajo Suya Spice", text: "Authentic Sobajo seasoning for grilling and cooking at home.", icon: "pepper" },
-  { name: "Sobajo Hot Sauce", text: "Our bold house heat, bottled for customers nationwide.", icon: "bottle" },
-  { name: "Beef Brisket Suya Packs", text: "Vacuum-sealed packs prepared for safe nationwide delivery.", icon: "package" },
-  { name: "Sobajo Gift Packages", text: "Curated boxes for birthdays, holidays and family surprises.", icon: "gift" },
-];
 
 const STEPS = [
   ["Choose products", "Select package size"],
@@ -15,7 +10,9 @@ const STEPS = [
   ["Track shipment", "USPS or UPS"],
 ];
 
-export default function Shipping() {
+/** Products come from Sanity → Shipping products. */
+export default async function Shipping() {
+  const products = await getShipping();
   return (
     <section className="section section-alt" id="shipping" aria-labelledby="shipping-title">
       <div className="container">
@@ -34,18 +31,20 @@ export default function Shipping() {
           </p>
         </div>
 
-        <div className="ship-grid">
-          {PRODUCTS.map((p) => (
-            <article className="ship-card" key={p.name}>
-              <div className="ship-icon">
-                <Icon name={p.icon} />
-              </div>
-              <h3>{p.name}</h3>
-              <p>{p.text}</p>
-              <span className="chip">Coming soon</span>
-            </article>
-          ))}
-        </div>
+        {products.length > 0 && (
+          <div className="ship-grid">
+            {products.map((p) => (
+              <article className="ship-card" key={p.name}>
+                <div className="ship-icon">
+                  <Icon name={p.icon} />
+                </div>
+                <h3>{p.name}</h3>
+                <p>{p.text}</p>
+                <span className="chip">{SHIPPING_STATUS_LABEL[p.status]}</span>
+              </article>
+            ))}
+          </div>
+        )}
 
         <div className="waitlist">
           <div>

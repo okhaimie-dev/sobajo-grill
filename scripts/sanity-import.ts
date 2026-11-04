@@ -1,6 +1,6 @@
 /**
  * One-time import: copies the seed content in lib/*.ts (menu, campaigns,
- * FAQs, business info) into Sanity, uploading every photo.
+ * FAQs, business info, shipping products) into Sanity, uploading every photo.
  *
  *   npm run sanity:import            # create what's missing, keep edits
  *   npm run sanity:import -- --force # overwrite Sanity with the seed
@@ -17,6 +17,7 @@ import { createClient } from "@sanity/client";
 import { CAMPAIGNS } from "../lib/campaigns";
 import { CATERING_FAQS, FAQS } from "../lib/faq";
 import { SECTION_DEFS, items } from "../lib/menu";
+import { SHIPPING_PRODUCTS } from "../lib/shipping";
 import { SITE } from "../lib/site";
 
 try {
@@ -174,6 +175,18 @@ async function main() {
       docs.push({ _id: `faq-${page}-${i + 1}`, _type: "faq", page, question: f.q, answer: f.a, sortOrder: (i + 1) * 10 })
     );
   }
+
+  SHIPPING_PRODUCTS.forEach((p, i) =>
+    docs.push({
+      _id: `shippingProduct-${slug(p.name)}`,
+      _type: "shippingProduct",
+      status: p.status,
+      name: p.name,
+      description: p.text,
+      icon: p.icon,
+      sortOrder: (i + 1) * 10,
+    })
+  );
 
   const existing = new Set(await client.fetch<string[]>(`*[_id in $ids]._id`, { ids: docs.map((d) => d._id) }));
   const tx = client.transaction();
