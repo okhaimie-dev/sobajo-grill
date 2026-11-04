@@ -10,7 +10,7 @@ import Faq from "@/components/faq";
 import { Icon } from "@/components/icons";
 import JsonLd from "@/components/json-ld";
 import LeadForm from "@/components/lead-form";
-import { DishCard, ListRows, Tiers } from "@/components/menu-items";
+import { DishCard, FeatureDish, ListRows, Tiers } from "@/components/menu-items";
 import PageHero from "@/components/page-hero";
 
 /**
@@ -137,11 +137,16 @@ export default async function CampaignPage({ params }: Props) {
                 : "Send your pre-order request below and we'll confirm your order, pickup day and payment with you."}
             </p>
           </div>
-          <div className="menu-grid">
-            {featured.map((i) => (
-              <DishCard key={i.name} item={i} />
-            ))}
-          </div>
+          {featured.length === 1 ? (
+            // One star dish (e.g. the Thanksgiving turkey): wide feature card, not a lone grid tile.
+            <FeatureDish item={featured[0]} />
+          ) : (
+            <div className="menu-grid">
+              {featured.map((i) => (
+                <DishCard key={i.name} item={i} />
+              ))}
+            </div>
+          )}
           {sides.length > 0 && (
             <div className="campaign-sides">
               <h3>On the side</h3>

@@ -44,7 +44,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-US" className={`${display.variable} ${body.variable}`}>
+    // suppressHydrationWarning: browser extensions add attributes to <html>
+    // before React loads (applies to this element's attributes only).
+    <html lang="en-US" className={`${display.variable} ${body.variable}`} suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );
