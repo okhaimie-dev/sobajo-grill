@@ -5,7 +5,7 @@
  */
 
 import type { Attribution, Touch } from "@/lib/attribution";
-import { getCampaign } from "@/lib/campaigns";
+import { type Campaign, findCampaign } from "@/lib/campaigns";
 
 export const LEAD_KINDS = ["catering", "preorder", "waitlist", "newsletter"] as const;
 export type LeadKind = (typeof LEAD_KINDS)[number];
@@ -27,8 +27,10 @@ export interface Lead {
   guests?: number;
   location?: string;
   message?: string;
-  /** Campaign slug (pre-orders), validated against lib/campaigns.ts. */
+  /** Campaign slug (pre-orders), validated against the live campaigns. */
   campaign?: string;
+  /** That campaign's display name, e.g. "Thanksgiving". */
+  campaignName?: string;
   /** YYYY-MM-DD */
   pickupDate?: string;
   /** Cart lines the guest had when they sent a pre-order (informational). */
@@ -58,7 +60,7 @@ function touch(v: unknown): Touch | undefined {
 }
 
 /** Returns the cleaned lead, or a user-facing error message. */
-export function parseLead(body: unknown, today = new Date()): Lead | string {
+export function parseLead(body: unknown, campaigns: Campaign[], today = new Date()): Lead | string {
   if (!body || typeof body !== "object") return "Invalid request.";
   const b = body as Record<string, unknown>;
 
@@ -85,9 +87,10 @@ export function parseLead(body: unknown, today = new Date()): Lead | string {
   if (kind === "preorder") {
     if (!lead.name) return "Please tell us your name.";
     if (!lead.phone) return "Please add a phone number so we can confirm your order.";
-    const campaign = getCampaign(str(b.campaign, 60) ?? "");
+    const campaign = findCampaign(campaigns, str(b.campaign, 60) ?? "");
     if (!campaign) return "Invalid request.";
     lead.campaign = campaign.slug;
+    lead.campaignName = campaign.name;
     const date = str(b.pickupDate, 10);
     if (date) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return "Please enter a valid pickup date.";
@@ -121,7 +124,7 @@ export function leadMarkdown(lead: Lead): string {
     ["Name", lead.name],
     ["Email", lead.email],
     ["Phone", lead.phone],
-    ["Campaign", lead.campaign ? getCampaign(lead.campaign)?.name : undefined],
+    ["Campaign", lead.campaignName],
     ["Pickup date", lead.pickupDate],
     ["Event date", lead.eventDate],
     ["Guests", lead.guests],

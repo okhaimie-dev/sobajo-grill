@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { asset } from "@/lib/assets";
-import { SITE } from "@/lib/site";
+import { getSite } from "@/lib/content";
 import { Icon, Stars } from "./icons";
 
-export default function Hero() {
+export default async function Hero() {
+  const site = await getSite();
   return (
     <section className="hero" id="top" aria-labelledby="hero-title">
       {/* Real <img> (not a CSS background) so it can be the prioritized LCP element. */}
@@ -37,15 +38,15 @@ export default function Hero() {
           </Link>
         </div>
         <div className="hero-meta">
-          <a href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
-            <Stars value={SITE.googleRating} label={`Rated ${SITE.googleRating} out of 5 on Google`} />
-            <strong>{SITE.googleRating}</strong> on Google
+          <a href={site.mapsUrl} target="_blank" rel="noopener noreferrer">
+            <Stars value={site.googleRating} label={`Rated ${site.googleRating} out of 5 on Google`} />
+            <strong>{site.googleRating}</strong> on Google
           </a>
           <span>
             <Icon name="truck" /> Pickup · Delivery · Catering
           </span>
-          <a href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
-            <Icon name="pin" /> {SITE.address.street}, {SITE.address.city}
+          <a href={site.mapsUrl} target="_blank" rel="noopener noreferrer">
+            <Icon name="pin" /> {site.address.street}, {site.address.city}
           </a>
         </div>
       </div>

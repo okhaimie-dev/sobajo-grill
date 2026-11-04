@@ -1,16 +1,17 @@
 import { renderOg } from "@/lib/og";
-import { SITE } from "@/lib/site";
+import { getSite } from "@/lib/content";
 
-// Social share card (links, ads, group chats), rendered once at build time.
-// A route named og.png — rather than the opengraph-image convention — so the
-// file keeps a .png extension and static hosts send image/png.
-export const dynamic = "force-static";
+// Social share card (links, ads, group chats), prerendered and refreshed with
+// the content (address from Sanity). A route named og.png — rather than the
+// opengraph-image convention — so the file keeps a .png extension.
+export const revalidate = 3600;
 
-export function GET() {
+export async function GET() {
+  const site = await getSite();
   return renderOg({
     eyebrow: "Baltimore Suya & African Grill",
     line1: "Fire. Flavor.",
     line2: "Friendship.",
-    footer: `Pickup · Delivery · Catering — ${SITE.address.street}, ${SITE.address.city}`,
+    footer: `Pickup · Delivery · Catering — ${site.address.street}, ${site.address.city}`,
   });
 }

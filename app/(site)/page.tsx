@@ -1,5 +1,4 @@
-import { FAQS } from "@/lib/faq";
-import { SITE } from "@/lib/site";
+import { getFaqs, getSite } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
 import { faqJsonLd } from "@/lib/structured-data";
 import Hero from "@/components/hero";
@@ -16,12 +15,16 @@ import Faq from "@/components/faq";
 import Cta from "@/components/cta";
 import JsonLd from "@/components/json-ld";
 
-export const metadata = pageMetadata({ description: SITE.description, path: "/" });
+export async function generateMetadata() {
+  const site = await getSite();
+  return pageMetadata({ description: site.description, path: "/", site });
+}
 
-export default function Home() {
+export default async function Home() {
+  const faqs = (await getFaqs()).home;
   return (
     <>
-      <JsonLd data={faqJsonLd(FAQS, "/")} />
+      <JsonLd data={faqJsonLd(faqs, "/")} />
       <Hero />
       <Marquee />
       <Experiences />
@@ -32,7 +35,7 @@ export default function Home() {
       <Reviews />
       <Visit />
       <Shipping />
-      <Faq />
+      <Faq faqs={faqs} />
       <Cta />
     </>
   );

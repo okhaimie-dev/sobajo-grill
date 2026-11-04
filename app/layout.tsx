@@ -1,17 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
-import "./globals.css";
-import AnnouncementBar from "@/components/announcement-bar";
-import Analytics from "@/components/analytics";
-import { CartProvider } from "@/components/cart-context";
-import CartFab from "@/components/cart-fab";
-import CartModal from "@/components/cart-modal";
-import Footer from "@/components/footer";
-import ItemModal from "@/components/item-modal";
-import JsonLd from "@/components/json-ld";
-import Nav from "@/components/nav";
+import { getSite } from "@/lib/content";
 import { SITE, SITE_URL } from "@/lib/site";
-import { restaurantJsonLd } from "@/lib/structured-data";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -20,27 +10,32 @@ const display = Bricolage_Grotesque({
 });
 const body = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 
-/** Site-wide defaults; each page sets title/description/canonical/OG via `pageMetadata`. */
-export const metadata: Metadata = {
-  // Trailing slash so relative metadata URLs keep the GitHub Pages sub-path.
-  metadataBase: new URL(SITE_URL + "/"),
-  title: { default: SITE.title, template: `%s | ${SITE.name}` },
-  description: SITE.description,
-  keywords: SITE.keywords,
-  applicationName: SITE.name,
-  category: "restaurant",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
-  },
-  formatDetection: { telephone: true, address: true, email: true },
-  // favicon + apple icon come from the app/ file conventions (base-path aware)
-};
-
-// Re-render hourly so date-based content (campaign announcement bar) switches
-// on and off without a redeploy.
-export const revalidate = 3600;
+/**
+ * Root shell shared by the public site (app/(site)/layout.tsx: nav, cart,
+ * footer) and the Sanity Studio (/studio), which needs a bare full screen.
+ *
+ * Site-wide metadata defaults; each page sets title/description/canonical/OG
+ * via `pageMetadata`.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  return {
+    // Trailing slash so relative metadata URLs keep the GitHub Pages sub-path.
+    metadataBase: new URL(SITE_URL + "/"),
+    title: { default: site.title, template: `%s | ${SITE.name}` },
+    description: site.description,
+    keywords: site.keywords,
+    applicationName: SITE.name,
+    category: "restaurant",
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+    },
+    formatDetection: { telephone: true, address: true, email: true },
+    // favicon + apple icon come from the app/ file conventions (base-path aware)
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#0a0706",
@@ -50,22 +45,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-US" className={`${display.variable} ${body.variable}`}>
-      <body>
-        <JsonLd data={restaurantJsonLd()} />
-        <a href="#main" className="skip-link">
-          Skip to content
-        </a>
-        <CartProvider>
-          <AnnouncementBar />
-          <Nav />
-          <main id="main">{children}</main>
-          <Footer />
-          <CartFab />
-          <ItemModal />
-          <CartModal />
-        </CartProvider>
-        <Analytics />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

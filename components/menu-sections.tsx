@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { MENU_SECTIONS, MenuSection } from "@/lib/menu";
+import type { MenuSection } from "@/lib/menu";
 import { Icon } from "./icons";
 import { DishCard, FeatureDish, ListRows, Tiers } from "./menu-items";
 
@@ -36,10 +36,10 @@ function Block({ section }: { section: MenuSection }) {
 }
 
 /** Highlights the tab for the menu block currently in view. */
-function useActiveSection(ids: string[]) {
-  const [active, setActive] = useState(ids[0]);
+function useActiveSection(idList: string) {
+  const [active, setActive] = useState(idList.split(" ")[0]);
   useEffect(() => {
-    const els = ids.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+    const els = idList.split(" ").map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
     const io = new IntersectionObserver(
       (entries) => {
         const visible = entries.filter((e) => e.isIntersecting);
@@ -49,15 +49,16 @@ function useActiveSection(ids: string[]) {
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, [ids]);
+  }, [idList]);
   return active;
 }
 
-const IDS = MENU_SECTIONS.map((s) => s.id);
-
 /** The full menu body for /menu/: sticky category bar + every section. */
-export default function MenuSections() {
-  const active = useActiveSection(IDS);
+export default function MenuSections({ sections: all }: { sections: MenuSection[] }) {
+  const sections = all.filter((s) => s.items.length);
+  // Space-joined so the observer effect only re-runs when the section list changes.
+  const ids = sections.map((s) => s.id).join(" ");
+  const active = useActiveSection(ids);
   const tabsRef = useRef<HTMLElement>(null);
 
   // Keep the active tab visible in the horizontally scrolling bar (mobile).
@@ -69,15 +70,15 @@ export default function MenuSections() {
   }, [active]);
 
   // Sides + drinks are short lists — show them side by side.
-  const lists = MENU_SECTIONS.filter((s) => s.layout === "list");
-  const rest = MENU_SECTIONS.filter((s) => s.layout !== "list");
+  const lists = sections.filter((s) => s.layout === "list");
+  const rest = sections.filter((s) => s.layout !== "list");
 
   return (
     <div className="section section-alt menu-page">
       <div className="container">
         <div className="menu-nav">
           <nav className="menu-tabs" ref={tabsRef} aria-label="Menu categories">
-            {MENU_SECTIONS.map((s) => (
+            {sections.map((s) => (
               <a
                 key={s.id}
                 href={`#${s.id}`}

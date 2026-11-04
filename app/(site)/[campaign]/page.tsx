@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { asset } from "@/lib/assets";
-import { CAMPAIGNS, formatDay, getCampaign } from "@/lib/campaigns";
-import { MENU_SECTIONS, MenuItem, items as MENU_ITEMS } from "@/lib/menu";
+import { formatDay } from "@/lib/campaigns";
+import { getCampaign, getCampaigns, getContent } from "@/lib/content";
+import { MenuItem, sectionById } from "@/lib/menu";
 import { OG_IMAGE, pageMetadata } from "@/lib/seo";
 import { SITE, absoluteUrl } from "@/lib/site";
 import { faqJsonLd } from "@/lib/structured-data";
@@ -12,17 +13,19 @@ import LeadForm from "@/components/lead-form";
 import { DishCard, ListRows, Tiers } from "@/components/menu-items";
 import PageHero from "@/components/page-hero";
 
-/** One landing page per entry in lib/campaigns.ts; unknown slugs 404. */
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return CAMPAIGNS.map((c) => ({ campaign: c.slug }));
+/**
+ * One landing page per campaign in Sanity. Known ones are prerendered at
+ * build; one created later renders on its first visit (then cached). Unknown
+ * slugs 404.
+ */
+export async function generateStaticParams() {
+  return (await getCampaigns()).map((c) => ({ campaign: c.slug }));
 }
 
 type Props = { params: Promise<{ campaign: string }> };
 
 export async function generateMetadata({ params }: Props) {
-  const c = getCampaign((await params).campaign);
+  const c = await getCampaign((await params).campaign);
   if (!c) return {};
   return pageMetadata({
     title: c.seo.title,
@@ -32,22 +35,20 @@ export async function generateMetadata({ params }: Props) {
   });
 }
 
-/** Menu items by exact name — a typo in lib/campaigns.ts fails the build. */
-function menuItems(names: string[], slug: string): MenuItem[] {
-  return names.map((name) => {
-    const item = MENU_ITEMS.find((i) => i.name === name);
-    if (!item) throw new Error(`Campaign "${slug}": no menu item named "${name}"`);
-    return item;
-  });
+/** Menu items by exact name, in the campaign's order (ones no longer on the menu are skipped). */
+function menuItems(all: MenuItem[], names: string[]): MenuItem[] {
+  return names.flatMap((name) => all.find((i) => i.name === name) ?? []);
 }
 
 export default async function CampaignPage({ params }: Props) {
-  const c = getCampaign((await params).campaign);
+  const [{ campaign: slug }, { campaigns, items, sections, site }] = await Promise.all([params, getContent()]);
+  const c = campaigns.find((x) => x.slug === slug);
   if (!c) notFound();
 
-  const featured = menuItems(c.featured, c.slug);
-  const sides = menuItems(c.sides, c.slug);
-  const platters = MENU_SECTIONS.find((s) => s.id === "ndokoti")!;
+  const featured = menuItems(items, c.featured);
+  const sides = menuItems(items, c.sides);
+  const platters = sectionById(sections, "ndokoti");
+  const heroSrc = c.hero.image.startsWith("http") ? `${c.hero.image}&w=1600` : asset(c.hero.image);
   const faqs = c.orderBy
     ? [{ q: `What's the last day to pre-order?`, a: `Please send your pre-order request by ${formatDay(c.orderBy)}.` }, ...c.faqs]
     : c.faqs;
@@ -70,7 +71,7 @@ export default async function CampaignPage({ params }: Props) {
           </>
         }
         lede={c.hero.lede}
-        image={{ src: asset(c.hero.image), alt: c.hero.imageAlt }}
+        image={{ src: heroSrc, alt: c.hero.imageAlt }}
       >
         <div className="hero-actions">
           <a className="btn btn-primary" href="#preorder">
@@ -142,7 +143,7 @@ export default async function CampaignPage({ params }: Props) {
         </div>
       </section>
 
-      {c.showPlatters && (
+      {c.showPlatters && platters.items.length > 0 && (
         <section className="section" aria-labelledby="platters-title">
           <div className="container">
             <div className="section-head">
@@ -169,8 +170,8 @@ export default async function CampaignPage({ params }: Props) {
             <p className="section-lede" style={{ marginTop: 16 }}>
               Send your request and we&apos;ll call or text to confirm your order, pickup time and
               payment. Prefer to talk? Call{" "}
-              <a href={`tel:${SITE.phoneE164}`} style={{ color: "var(--gold)", fontWeight: 700 }}>
-                {SITE.phone}
+              <a href={`tel:${site.phoneE164}`} style={{ color: "var(--gold)", fontWeight: 700 }}>
+                {site.phone}
               </a>
               .
             </p>
@@ -192,7 +193,7 @@ export default async function CampaignPage({ params }: Props) {
                 <dd>
                   {c.pickupWindows?.length
                     ? c.pickupWindows.join(" · ")
-                    : `${SITE.address.street}, ${SITE.address.city} — time confirmed with your order`}
+                    : `${site.address.street}, ${site.address.city} — time confirmed with your order`}
                 </dd>
               </div>
               <div>
@@ -226,8 +227,8 @@ export default async function CampaignPage({ params }: Props) {
               <a className="btn btn-dark" href="#preorder">
                 Pre-order now <Icon name="arrow" />
               </a>
-              <a className="btn btn-ghost" href={`tel:${SITE.phoneE164}`}>
-                <Icon name="phone" /> {SITE.phone}
+              <a className="btn btn-ghost" href={`tel:${site.phoneE164}`}>
+                <Icon name="phone" /> {site.phone}
               </a>
             </div>
           </div>

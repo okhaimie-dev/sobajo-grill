@@ -1,10 +1,9 @@
 import type { ReactNode } from "react";
-import { FAQS } from "@/lib/faq";
-import { SITE } from "@/lib/site";
+import { getSite } from "@/lib/content";
 import { Icon } from "./icons";
 
-export default function Faq({
-  faqs = FAQS,
+export default async function Faq({
+  faqs,
   title = (
     <>
       Questions, <em>answered.</em>
@@ -12,10 +11,11 @@ export default function Faq({
   ),
   intro = "Planning an event or a big order? Reach out — we're happy to help.",
 }: {
-  faqs?: { q: string; a: string }[];
+  faqs: { q: string; a: string }[];
   title?: ReactNode;
   intro?: string;
 }) {
+  const site = await getSite();
   return (
     <section className="section" id="faq" aria-labelledby="faq-title">
       <div className="container faq-grid">
@@ -26,14 +26,14 @@ export default function Faq({
           </h2>
           <p>{intro}</p>
           <div className="contact-list">
-            <a href={`tel:${SITE.phoneE164}`}>
-              <Icon name="phone" /> {SITE.phone}
+            <a href={`tel:${site.phoneE164}`}>
+              <Icon name="phone" /> {site.phone}
             </a>
-            <a href={`mailto:${SITE.email}`}>
-              <Icon name="mail" /> {SITE.email}
+            <a href={`mailto:${site.email}`}>
+              <Icon name="mail" /> {site.email}
             </a>
-            <a href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
-              <Icon name="pin" /> {SITE.address.street}, {SITE.address.city}, {SITE.address.region}
+            <a href={site.mapsUrl} target="_blank" rel="noopener noreferrer">
+              <Icon name="pin" /> {site.address.street}, {site.address.city}, {site.address.region}
             </a>
           </div>
         </div>

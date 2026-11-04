@@ -8,8 +8,9 @@ import { getAttribution } from "@/lib/attribution";
 import type { LeadKind } from "@/lib/leads/schema";
 import { BASE_PATH } from "@/lib/assets";
 import { money } from "@/lib/menu";
-import { CATERING_QUOTE_HREF, SITE } from "@/lib/site";
+import { cateringQuoteHref } from "@/lib/site";
 import { useCart } from "./cart-context";
+import { useSite } from "./site-context";
 import { Icon } from "./icons";
 
 const COPY: Record<LeadKind, { button: string; done: string; doneText: string }> = {
@@ -52,6 +53,7 @@ export default function LeadForm({
   maxDate?: string;
 }) {
   const pathname = usePathname();
+  const site = useSite();
   const { lines, clearCart } = useCart();
   const cartItems = lines.map(
     (l) => `${l.name} — ${[l.variation, l.quantity > 1 ? `× ${l.quantity}` : "", l.side, l.notes].filter(Boolean).join(" · ")} (${money(l.price)})`
@@ -103,7 +105,7 @@ export default function LeadForm({
     );
   }
 
-  const fallback = kind === "catering" ? CATERING_QUOTE_HREF : `mailto:${SITE.email}`;
+  const fallback = kind === "catering" ? cateringQuoteHref(site.email) : `mailto:${site.email}`;
 
   return (
     <form className={`lead-form lead-${kind}${compact ? " compact" : ""}`} onSubmit={onSubmit}>

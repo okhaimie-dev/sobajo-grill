@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import type { GooglePlace, GoogleReview } from "@/lib/google-place";
 import { CURATED_REVIEWS, CuratedReview } from "@/lib/reviews";
-import { SITE } from "@/lib/site";
+import { useSite } from "./site-context";
 import { Icon, Stars } from "./icons";
 import { useGooglePlace } from "./use-google-place";
 
@@ -94,6 +94,7 @@ function RatingSummary({ place }: { place: GooglePlace }) {
 }
 
 export default function Reviews() {
+  const site = useSite();
   const ref = useRef<HTMLElement>(null);
   const state = useGooglePlace(ref);
   const place = state.status === "ready" && state.place.reviews.length ? state.place : null;
@@ -111,10 +112,10 @@ export default function Reviews() {
           {place ? (
             <RatingSummary place={place} />
           ) : (
-            <a className="rating-summary" href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
-              <strong>{SITE.googleRating.toFixed(1)}</strong>
+            <a className="rating-summary" href={site.mapsUrl} target="_blank" rel="noopener noreferrer">
+              <strong>{site.googleRating.toFixed(1)}</strong>
               <div>
-                <Stars value={SITE.googleRating} label={`Rated ${SITE.googleRating} out of 5 on Google`} />
+                <Stars value={site.googleRating} label={`Rated ${site.googleRating} out of 5 on Google`} />
                 <span className="rating-count">
                   on <b>Google</b> · read our reviews
                 </span>
@@ -151,12 +152,12 @@ export default function Reviews() {
         {!place && (
           <div className="reviews-foot">
             <p className="google-attribution">
-              <a href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
+              <a href={site.mapsUrl} target="_blank" rel="noopener noreferrer">
                 Read more reviews on Google Maps
               </a>
             </p>
-            {SITE.googleReviewUrl && (
-              <a className="btn btn-gold btn-sm" href={SITE.googleReviewUrl} target="_blank" rel="noopener noreferrer">
+            {site.googleReviewUrl && (
+              <a className="btn btn-gold btn-sm" href={site.googleReviewUrl} target="_blank" rel="noopener noreferrer">
                 <Icon name="star" /> Leave us a review
               </a>
             )}

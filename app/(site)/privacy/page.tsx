@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { pageMetadata } from "@/lib/seo";
+import { getSite } from "@/lib/content";
 import { SITE } from "@/lib/site";
 import PageHero from "@/components/page-hero";
 
@@ -18,8 +19,9 @@ export const metadata = pageMetadata({
   path: "/privacy/",
 });
 
-export default function PrivacyPage() {
-  const { address } = SITE;
+export default async function PrivacyPage() {
+  const site = await getSite();
+  const { address } = site;
   return (
     <>
       <PageHero
@@ -35,8 +37,8 @@ export default function PrivacyPage() {
           <p>
             {SITE.name} (&ldquo;we&rdquo;, &ldquo;us&rdquo;) is a restaurant and caterer at {address.street},{" "}
             {address.city}, {address.region} {address.postalCode}. Questions about this policy? Email{" "}
-            <a href={`mailto:${SITE.email}`}>{SITE.email}</a> or call{" "}
-            <a href={`tel:${SITE.phoneE164}`}>{SITE.phone}</a>.
+            <a href={`mailto:${site.email}`}>{site.email}</a> or call{" "}
+            <a href={`tel:${site.phoneE164}`}>{site.phone}</a>.
           </p>
 
           <h2>Information you give us</h2>
@@ -135,7 +137,7 @@ export default function PrivacyPage() {
               .
             </li>
             <li>
-              <strong>Access, correction and deletion:</strong> email <a href={`mailto:${SITE.email}`}>{SITE.email}</a>{" "}
+              <strong>Access, correction and deletion:</strong> email <a href={`mailto:${site.email}`}>{site.email}</a>{" "}
               to ask what we hold about you, correct it, or delete it. We&apos;ll respond within a reasonable time.
             </li>
           </ul>

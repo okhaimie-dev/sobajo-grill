@@ -483,6 +483,11 @@ p { margin: 0; text-wrap: pretty; }
 .add-btn::after { content: ""; position: absolute; inset: 0; }
 .dish-card:hover .add-btn,
 .add-btn:hover { background: var(--red-btn-hover); }
+/* Sold out / coming soon (Sanity status): listed but not orderable. */
+.add-btn:disabled, .add-btn:disabled:hover, .dish-card:hover .add-btn:disabled { background: var(--line-strong); color: var(--muted); cursor: not-allowed; }
+.add-btn:disabled::after { content: none; }
+.icon-add:disabled, .size-list button:disabled { opacity: 0.4; cursor: not-allowed; }
+.dish-card.is-unavailable .dish-media img { filter: grayscale(0.6) brightness(0.75); }
 
 /* featured signature dish */
 .feature-dish {

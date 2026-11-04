@@ -1,11 +1,13 @@
 import { BASE_PATH } from "@/lib/assets";
-import { items, sideOptions } from "@/lib/menu";
+import { getMenu } from "@/lib/content";
+import { MenuItem, sideOptions } from "@/lib/menu";
 import { SquareLineItem, createPaymentLink, squareConfigured } from "@/lib/square";
 
 /**
  * POST /api/checkout — turns the cart into a Square hosted checkout link.
- * Prices are looked up from the menu here; the client only says what was
- * picked, so a tampered cart can't change what the customer is charged.
+ * Prices are looked up from the menu (Sanity, same cached copy the pages
+ * render) here; the client only says what was picked, so a tampered cart
+ * can't change what the customer is charged.
  */
 
 const json = (status: number, body: object) => Response.json(body, { status });
@@ -27,6 +29,15 @@ export async function POST(request: Request) {
 
   const rawLines = Array.isArray(body.lines) ? body.lines : [];
   if (!rawLines.length || rawLines.length > 50) return json(400, { error: "Your cart is empty." });
+
+  let items: MenuItem[];
+  try {
+    ({ items } = await getMenu());
+  } catch (err) {
+    // Never guess prices: no menu, no checkout.
+    console.error("[checkout] could not load the menu", err);
+    return json(503, { error: "Online checkout is temporarily unavailable. Please try again in a minute or call us." });
+  }
 
   const lineItems: SquareLineItem[] = [];
   for (const raw of rawLines as Record<string, unknown>[]) {

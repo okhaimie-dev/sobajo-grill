@@ -1,7 +1,7 @@
 "use client";
 
-import { SITE } from "@/lib/site";
 import { useCart } from "./cart-context";
+import { useSite } from "./site-context";
 import { Icon, IconName } from "./icons";
 
 const STATS: { icon: IconName; value: string; label: string }[] = [
@@ -12,6 +12,7 @@ const STATS: { icon: IconName; value: string; label: string }[] = [
 ];
 
 export default function Delivery() {
+  const site = useSite();
   const { openCart } = useCart();
 
   return (
@@ -65,8 +66,8 @@ export default function Delivery() {
             <button className="btn btn-primary" onClick={openCart}>
               Review my order <Icon name="arrow" />
             </button>
-            {SITE.doordashUrl && (
-              <a className="btn btn-ghost" href={SITE.doordashUrl} target="_blank" rel="noopener noreferrer">
+            {site.doordashUrl && (
+              <a className="btn btn-ghost" href={site.doordashUrl} target="_blank" rel="noopener noreferrer">
                 Order on DoorDash
               </a>
             )}

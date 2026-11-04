@@ -1,8 +1,7 @@
 import { asset } from "@/lib/assets";
-import { CATERING_FAQS } from "@/lib/faq";
-import { MENU_SECTIONS } from "@/lib/menu";
+import { getContent } from "@/lib/content";
+import { sectionById } from "@/lib/menu";
 import { pageMetadata } from "@/lib/seo";
-import { SITE } from "@/lib/site";
 import { cateringServiceJsonLd, faqJsonLd } from "@/lib/structured-data";
 import CateringTrays from "@/components/catering-trays";
 import Faq from "@/components/faq";
@@ -17,9 +16,6 @@ export const metadata = pageMetadata({
   description: `Cater your next event with Sobajo Grill: half and full pans of beef brisket suya, Obasanjo Fire Chicken, wings, turkey wings and grilled fish. Pickup in Baltimore or delivery via DoorDash. Trays from $50.`,
   path: "/catering/",
 });
-
-const trays = MENU_SECTIONS.find((s) => s.id === "catering-menu")!;
-const ndokoti = MENU_SECTIONS.find((s) => s.id === "ndokoti")!;
 
 const OCCASIONS: { label: string; text: string; icon: IconName }[] = [
   { label: "Offices", text: "Team lunches, meetings and client days.", icon: "store" },
@@ -38,11 +34,15 @@ const STEPS = [
   ["We bring the fire", "Everything arrives hot, with onions and Sobajo hot sauce."],
 ];
 
-export default function CateringPage() {
+export default async function CateringPage() {
+  const { sections, faqs: allFaqs, site } = await getContent();
+  const trays = sectionById(sections, "catering-menu");
+  const ndokoti = sectionById(sections, "ndokoti");
+  const faqs = allFaqs.catering;
   return (
     <>
       <JsonLd data={cateringServiceJsonLd(trays)} />
-      <JsonLd data={faqJsonLd(CATERING_FAQS, "/catering/")} />
+      <JsonLd data={faqJsonLd(faqs, "/catering/")} />
 
       <PageHero
         crumb="Catering"
@@ -178,8 +178,8 @@ export default function CateringPage() {
             <p className="section-lede" style={{ marginTop: 16 }}>
               Share your date, guest count and location and we&apos;ll put together the perfect
               Sobajo feast. Prefer to talk? Call{" "}
-              <a href={`tel:${SITE.phoneE164}`} style={{ color: "var(--gold)", fontWeight: 700 }}>
-                {SITE.phone}
+              <a href={`tel:${site.phoneE164}`} style={{ color: "var(--gold)", fontWeight: 700 }}>
+                {site.phone}
               </a>
               .
             </p>
@@ -191,7 +191,7 @@ export default function CateringPage() {
       </section>
 
       <Faq
-        faqs={CATERING_FAQS}
+        faqs={faqs}
         title={
           <>
             Catering, <em>answered.</em>
@@ -209,8 +209,8 @@ export default function CateringPage() {
               <a className="btn btn-dark" href="#quote">
                 <Icon name="mail" /> Request a quote
               </a>
-              <a className="btn btn-ghost" href={`tel:${SITE.phoneE164}`}>
-                <Icon name="phone" /> {SITE.phone}
+              <a className="btn btn-ghost" href={`tel:${site.phoneE164}`}>
+                <Icon name="phone" /> {site.phone}
               </a>
             </div>
           </div>

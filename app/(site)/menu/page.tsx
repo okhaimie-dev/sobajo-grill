@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getMenu } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
 import { menuJsonLd } from "@/lib/structured-data";
 import Cta from "@/components/cta";
@@ -14,10 +15,11 @@ export const metadata = pageMetadata({
   path: "/menu/",
 });
 
-export default function MenuPage() {
+export default async function MenuPage() {
+  const { sections } = await getMenu();
   return (
     <>
-      <JsonLd data={menuJsonLd()} />
+      <JsonLd data={menuJsonLd(sections)} />
       <PageHero
         crumb="Menu"
         path="/menu/"
@@ -45,7 +47,7 @@ export default function MenuPage() {
           </Link>
         </div>
       </PageHero>
-      <MenuSections />
+      <MenuSections sections={sections} />
       <Cta />
     </>
   );

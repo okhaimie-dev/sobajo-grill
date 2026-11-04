@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { asset } from "@/lib/assets";
-import { SITE } from "@/lib/site";
 import { useCart } from "./cart-context";
+import { useSite } from "./site-context";
 import { Icon } from "./icons";
 
 const NAV_LINKS = [
@@ -19,6 +19,7 @@ const NAV_LINKS = [
 ];
 
 export default function Nav() {
+  const site = useSite();
   const { count, openCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -89,8 +90,8 @@ export default function Nav() {
             <Link className="btn btn-primary" href="/menu/">
               Start your order
             </Link>
-            <a className="btn btn-ghost" href={`tel:${SITE.phoneE164}`}>
-              <Icon name="phone" /> {SITE.phone}
+            <a className="btn btn-ghost" href={`tel:${site.phoneE164}`}>
+              <Icon name="phone" /> {site.phone}
             </a>
           </div>
         </div>

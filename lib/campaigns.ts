@@ -1,12 +1,13 @@
 /**
- * Marketing campaigns. Each entry becomes a landing page at /<slug>/ (with
- * its own SEO metadata, share image and sitemap entry), and while it's live
- * a site-wide announcement bar links to it. A new campaign is a new entry
- * here — no new page code.
+ * Marketing campaigns, edited in Sanity → Campaigns and loaded by
+ * lib/content.ts. Each becomes a landing page at /<slug>/ (with its own SEO
+ * metadata, share image and sitemap entry), and while it's live a site-wide
+ * announcement bar links to it. `CAMPAIGNS` below is the import seed and the
+ * fallback without Sanity.
  *
- * Featured dishes reference lib/menu.ts by name, so prices always match the
- * menu. Leave owner decisions (deadline, pickup days) null until confirmed:
- * the page hides anything that isn't set.
+ * Featured dishes are menu items by name, so prices always match the menu.
+ * Owner decisions (deadline, pickup days) stay null until set: the page hides
+ * anything that isn't.
  */
 
 import type { IconName } from "@/components/icons";
@@ -28,6 +29,7 @@ export interface Campaign {
   /** TODO(owner): pickup days/times, e.g. ["Wed, Nov 25 · 12–8 PM"]. */
   pickupWindows: string[] | null;
   seo: { title: string; description: string };
+  /** image: a /public path or an image base URL that takes `&w=` (Sanity CDN). */
   hero: { eyebrow: string; title: string; accent: string; lede: string; image: string; imageAlt: string };
   /** Share-image headline (two lines). */
   og: { line1: string; line2: string };
@@ -98,7 +100,7 @@ export const CAMPAIGNS: Campaign[] = [
       },
       {
         q: "What should I order for a big group?",
-        a: "Catering trays come in half and full pans (shallow or deep). For an all-in-one spread, Ndokoti platters combine brisket suya, chicken, wings and sides and serve up to 4–6.",
+        a: "Catering trays come in half pans (shallow or deep) and full trays. For an all-in-one spread, Ndokoti platters combine brisket suya, chicken, wings and sides and serve up to 4–6.",
       },
       {
         q: "Can you make it less spicy?",
@@ -108,8 +110,8 @@ export const CAMPAIGNS: Campaign[] = [
   },
 ];
 
-export function getCampaign(slug: string): Campaign | undefined {
-  return CAMPAIGNS.find((c) => c.slug === slug);
+export function findCampaign(campaigns: Campaign[], slug: string): Campaign | undefined {
+  return campaigns.find((c) => c.slug === slug);
 }
 
 /** Today's date in Baltimore as YYYY-MM-DD. */
@@ -118,9 +120,9 @@ export function todayInBaltimore(now = new Date()): string {
 }
 
 /** The campaign whose announcement bar should show today, if any. */
-export function activeCampaign(now = new Date()): Campaign | undefined {
+export function activeCampaign(campaigns: Campaign[], now = new Date()): Campaign | undefined {
   const today = todayInBaltimore(now);
-  return CAMPAIGNS.find((c) => c.bannerFrom <= today && today <= c.bannerUntil);
+  return campaigns.find((c) => c.bannerFrom <= today && today <= c.bannerUntil);
 }
 
 /** "Thursday, November 26" */

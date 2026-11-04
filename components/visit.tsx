@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { SITE } from "@/lib/site";
+import type { Site } from "@/lib/site";
+import { useSite } from "./site-context";
 import { Icon } from "./icons";
 import { useGooglePlace } from "./use-google-place";
 
@@ -14,9 +15,9 @@ const PLACE_ID = process.env.NEXT_PUBLIC_GOOGLE_PLACE_ID;
  * we use Google Maps' keyless embed — no account, no card — which still
  * shows the live business card (rating + review count) and directions.
  */
-function embedSrc(): string {
-  const { street, city, region, postalCode } = SITE.address;
-  const query = `${SITE.name}, ${street}, ${city}, ${region} ${postalCode}`;
+function embedSrc(site: Site): string {
+  const { street, city, region, postalCode } = site.address;
+  const query = `${site.name}, ${street}, ${city}, ${region} ${postalCode}`;
   if (!EMBED_KEY) return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
   const q = PLACE_ID ? `place_id:${PLACE_ID}` : query;
   return `https://www.google.com/maps/embed/v1/place?key=${EMBED_KEY}&q=${encodeURIComponent(q)}`;
@@ -29,24 +30,25 @@ const to12h = (t: string) => {
   return `${((h + 11) % 12) + 1}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
 };
 
-/** Weekly lines ("Monday: 12:00 PM – 8:00 PM") from the hand-entered SITE.hours. */
-function siteHours(): string[] {
-  if (!SITE.hours.length) return [];
+/** Weekly lines ("Monday: 12:00 PM – 8:00 PM") from the hours entered in Sanity → Business info. */
+function siteHours(site: Site): string[] {
+  if (!site.hours.length) return [];
   return DAY_ORDER.map((day) => {
-    const slots = SITE.hours.filter((h) => h.days.includes(day));
+    const slots = site.hours.filter((h) => h.days.includes(day));
     return `${day}: ${slots.length ? slots.map((h) => `${to12h(h.opens)} – ${to12h(h.closes)}`).join(", ") : "Closed"}`;
   });
 }
 
 export default function Visit() {
+  const site = useSite();
   const ref = useRef<HTMLElement>(null);
   const state = useGooglePlace(ref);
   const place = state.status === "ready" ? state.place : null;
-  const src = embedSrc();
-  const { address } = SITE;
+  const src = embedSrc(site);
+  const { address } = site;
   const today = DAY_ORDER[(new Date().getDay() + 6) % 7];
-  // Live Google hours when the Places API is on; otherwise the hours entered in lib/site.ts.
-  const hours = place?.hours.length ? place.hours : siteHours();
+  // Live Google hours when the Places API is on; otherwise the hours entered in Sanity.
+  const hours = place?.hours.length ? place.hours : siteHours(site);
 
   return (
     <section className="section" id="visit" aria-labelledby="visit-title" ref={ref}>
@@ -59,7 +61,7 @@ export default function Visit() {
             Find the <em>fire.</em>
           </h2>
           <address className="visit-address">
-            <strong>{SITE.name}</strong>
+            <strong>{site.name}</strong>
             {address.street}
             <br />
             {address.city}, {address.region} {address.postalCode}
@@ -93,7 +95,7 @@ export default function Visit() {
               </>
             ) : (
               <p className="visit-muted">
-                {state.status === "loading" ? "Loading hours…" : `Call ${SITE.phone} for today's hours.`}
+                {state.status === "loading" ? "Loading hours…" : `Call ${site.phone} for today's hours.`}
               </p>
             )}
           </div>
@@ -101,14 +103,14 @@ export default function Visit() {
           <div className="hero-actions">
             <a
               className="btn btn-primary"
-              href={place?.directionsUri ?? SITE.mapsUrl}
+              href={place?.directionsUri ?? site.mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
             >
               <Icon name="route" /> Get directions
             </a>
-            <a className="btn btn-ghost" href={`tel:${SITE.phoneE164}`}>
-              <Icon name="phone" /> {SITE.phone}
+            <a className="btn btn-ghost" href={`tel:${site.phoneE164}`}>
+              <Icon name="phone" /> {site.phone}
             </a>
           </div>
         </div>
@@ -116,7 +118,7 @@ export default function Visit() {
         <div className="visit-map">
           <iframe
             src={src}
-            title={`Map showing ${SITE.name} at ${address.street}, ${address.city}`}
+            title={`Map showing ${site.name} at ${address.street}, ${address.city}`}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             allowFullScreen

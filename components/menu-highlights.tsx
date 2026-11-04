@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { MENU_SECTIONS } from "@/lib/menu";
+import { getMenu } from "@/lib/content";
+import { sectionById } from "@/lib/menu";
 import { Icon } from "./icons";
 import { DishCard, FeatureDish } from "./menu-items";
 
-const signature = MENU_SECTIONS.find((s) => s.id === "bowls")!.items[0];
-const grill = MENU_SECTIONS.find((s) => s.id === "grill")!.items;
-
 /** Home-page teaser: the signature dish + fire-grilled collection, linking to /menu/. */
-export default function MenuHighlights() {
+export default async function MenuHighlights() {
+  const { sections } = await getMenu();
+  const signature = sectionById(sections, "bowls").items[0];
+  const grill = sectionById(sections, "grill").items;
   return (
     <section className="section section-alt" id="menu" aria-labelledby="menu-title">
       <div className="container">
@@ -23,7 +24,7 @@ export default function MenuHighlights() {
             platters, catering trays, sides and drinks.
           </p>
         </div>
-        <FeatureDish item={signature} />
+        {signature && <FeatureDish item={signature} />}
         <div className="menu-grid" style={{ marginTop: 18 }}>
           {grill.map((i) => (
             <DishCard key={i.name} item={i} />

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { asset } from "@/lib/assets";
-import { SITE } from "@/lib/site";
+import { getSite } from "@/lib/content";
 import { Icon } from "./icons";
 import LeadForm from "./lead-form";
 
@@ -15,8 +15,9 @@ const EXPLORE_LINKS = [
   { href: "/#faq", label: "FAQ" },
 ];
 
-export default function Footer() {
-  const { address, socials } = SITE;
+export default async function Footer() {
+  const site = await getSite();
+  const { address, socials } = site;
   return (
     <footer className="footer">
       <div className="container newsletter">
@@ -45,13 +46,13 @@ export default function Footer() {
         <div>
           <h2>Visit</h2>
           <address>
-            <a href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer">
+            <a href={site.mapsUrl} target="_blank" rel="noopener noreferrer">
               {address.street}
               <br />
               {address.city}, {address.region} {address.postalCode}
             </a>
-            <a href={`tel:${SITE.phoneE164}`}>{SITE.phone}</a>
-            <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+            <a href={`tel:${site.phoneE164}`}>{site.phone}</a>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
           </address>
         </div>
         <div>
@@ -77,15 +78,15 @@ export default function Footer() {
                 TikTok {socials.tiktok.handle}
               </a>
             </li>
-            {SITE.doordashUrl && (
+            {site.doordashUrl && (
               <li>
-                <a href={SITE.doordashUrl} target="_blank" rel="noopener noreferrer">
+                <a href={site.doordashUrl} target="_blank" rel="noopener noreferrer">
                   Order on DoorDash
                 </a>
               </li>
             )}
             <li>
-              <a href={SITE.cashAppUrl} target="_blank" rel="noopener noreferrer">
+              <a href={site.cashAppUrl} target="_blank" rel="noopener noreferrer">
                 Cash App $sobajogrillmd
               </a>
             </li>

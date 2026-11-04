@@ -4,8 +4,8 @@
  * BreadcrumbList) that point back to it through @id.
  */
 
-import { MENU_SECTIONS, MenuItem, MenuSection } from "./menu";
-import { SITE, absoluteUrl } from "./site";
+import { MenuItem, MenuSection } from "./menu";
+import { SITE, Site, absoluteUrl } from "./site";
 
 export const RESTAURANT_ID = absoluteUrl("/#restaurant");
 const MENU_ID = absoluteUrl("/menu/#menu");
@@ -27,9 +27,11 @@ function menuItem(item: MenuItem) {
       price: price.toFixed(2),
       priceCurrency: "USD",
       availability:
-        item.available === false
+        item.status === "comingSoon"
           ? "https://schema.org/OutOfStock"
-          : "https://schema.org/InStock",
+          : item.available === false
+            ? "https://schema.org/SoldOut"
+            : "https://schema.org/InStock",
     })),
   };
 }
@@ -43,8 +45,8 @@ function menuSection(s: MenuSection) {
   };
 }
 
-export function restaurantJsonLd() {
-  const { address } = SITE;
+export function restaurantJsonLd(site: Site) {
+  const { address } = site;
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -52,13 +54,13 @@ export function restaurantJsonLd() {
         "@type": "Restaurant",
         "@id": RESTAURANT_ID,
         name: SITE.name,
-        slogan: SITE.tagline,
-        description: SITE.description,
+        slogan: site.tagline,
+        description: site.description,
         url: absoluteUrl("/"),
         logo: absoluteUrl("/logo.png"),
         image: [absoluteUrl("/hero.jpg"), absoluteUrl("/catering.jpg"), absoluteUrl("/story.jpg")],
-        telephone: SITE.phoneE164,
-        email: SITE.email,
+        telephone: site.phoneE164,
+        email: site.email,
         priceRange: SITE.priceRange,
         servesCuisine: SITE.cuisines,
         address: {
@@ -69,12 +71,12 @@ export function restaurantJsonLd() {
           postalCode: address.postalCode,
           addressCountry: address.country,
         },
-        hasMap: SITE.mapsUrl,
+        hasMap: site.mapsUrl,
         areaServed: { "@type": "City", name: "Baltimore" },
-        sameAs: Object.values(SITE.socials).map((s) => s.url),
+        sameAs: Object.values(site.socials).map((s) => s.url).filter(Boolean),
         acceptsReservations: false,
-        ...(SITE.hours.length && {
-          openingHoursSpecification: SITE.hours.map((h) => ({
+        ...(site.hours.length && {
+          openingHoursSpecification: site.hours.map((h) => ({
             "@type": "OpeningHoursSpecification",
             dayOfWeek: h.days,
             opens: h.opens,
@@ -101,7 +103,7 @@ export function restaurantJsonLd() {
 }
 
 /** Full Menu (every section, item and priced size) for /menu/. */
-export function menuJsonLd() {
+export function menuJsonLd(sections: MenuSection[]) {
   return {
     "@context": "https://schema.org",
     "@type": "Menu",
@@ -111,7 +113,7 @@ export function menuJsonLd() {
     inLanguage: "en-US",
     mainEntityOfPage: absoluteUrl("/menu/"),
     provider: { "@id": RESTAURANT_ID },
-    hasMenuSection: MENU_SECTIONS.map(menuSection),
+    hasMenuSection: sections.filter((s) => s.items.length).map(menuSection),
   };
 }
 

@@ -1,7 +1,9 @@
 /**
- * Business facts in one place — used by the UI (nav, footer, FAQ), page
- * metadata, sitemap/robots and the schema.org JSON-LD. Update here, not in
- * components.
+ * Business facts. The editable ones (contact, hours, links, rating, SEO
+ * copy) live in Sanity → "Business info" and are loaded by lib/content.ts
+ * (`getSite()` on the server, `useSite()` in client components); `SITE` here
+ * is the seed for the import script, the fallback without Sanity, and the
+ * home of the fixed brand facts (name, cuisines, price range).
  */
 
 import { BASE_PATH } from "./assets";
@@ -15,7 +17,8 @@ import { BASE_PATH } from "./assets";
  * 3. Local dev.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ??
+  // `||`: a blank NEXT_PUBLIC_SITE_URL= (as in .env.example) counts as unset.
+  process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}${BASE_PATH}`
     : `http://localhost:3000${BASE_PATH}`)
@@ -86,7 +89,23 @@ export const SITE = {
   hours: [] as { days: string[]; opens: string; closes: string }[],
 };
 
+export type Site = typeof SITE;
+
+/** "(443) 772-6661" → "+14437726661" (US numbers). */
+export function phoneToE164(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return `+${digits.length === 10 ? "1" + digits : digits}`;
+}
+
+export function mapsUrlFor(name: string, a: Site["address"]): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${name} ${a.street} ${a.city} ${a.region} ${a.postalCode}`
+  ).replace(/%20/g, "+")}`;
+}
+
 /** Pre-filled catering quote email (used by the catering teaser + page). */
-export const CATERING_QUOTE_HREF = `mailto:${SITE.email}?subject=${encodeURIComponent(
-  "Catering request"
-)}&body=${encodeURIComponent("Event date:\nGuest count:\nLocation:\nDishes I'm interested in:\n")}`;
+export function cateringQuoteHref(email: string): string {
+  return `mailto:${email}?subject=${encodeURIComponent("Catering request")}&body=${encodeURIComponent(
+    "Event date:\nGuest count:\nLocation:\nDishes I'm interested in:\n"
+  )}`;
+}

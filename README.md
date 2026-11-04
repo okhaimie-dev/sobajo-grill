@@ -24,6 +24,50 @@ branch gets its own preview URL.
 - `NEXT_PUBLIC_BASE_PATH` is still honored for sub-path hosts but is unset on
   Vercel. (The old GitHub Pages workflow has been retired.)
 
+## Content (Sanity CMS)
+
+Menu, prices, sold-out status, photos, campaigns, FAQs and business info
+(contact, hours, links, rating, SEO copy) are edited in **Sanity Studio** at
+**`/studio`** (e.g. https://sobajo-grill.vercel.app/studio). Staff sign in
+with their Sanity account; invite them at sanity.io/manage → project
+`n4i8duqa` → Members (role **Editor**, or **Contributor** for draft-only).
+
+- **How changes go live** — publishing fires a Sanity webhook →
+  `/api/revalidate` → the cached content is expired and the next visit shows
+  the change (seconds). Without the webhook, changes still appear within an
+  hour.
+- **Sold out / Coming soon** — set an item's *Status* (Available · Sold out
+  · Coming soon); the *Sold out & coming soon* list in the Studio sidebar
+  shows them all. Such items stay on the menu with that label, and checkout
+  refuses them.
+- **Prices** — checkout always reprices the cart on the server from the same
+  Sanity menu the pages render. If Sanity can't be reached, checkout says
+  "try again" rather than charging a stale price.
+- **Code map** — schemas in `sanity/schemaTypes/`, sidebar in
+  `sanity/structure.ts`, Studio config `sanity.config.ts`, loader
+  `lib/content.ts` (one GROQ query, cache tag `sanity`). Section anchors
+  `bowls`, `grill`, `ndokoti` and `catering-menu` are referenced by the home,
+  catering and campaign pages — don't change those anchors in the Studio.
+- **Seed / fallback** — the data in `lib/menu.ts`, `lib/campaigns.ts`,
+  `lib/faq.ts`, `lib/site.ts` is what `npm run sanity:import` copied into
+  Sanity, and what the site uses when `NEXT_PUBLIC_SANITY_PROJECT_ID` is
+  unset. It is **not** kept in sync — Sanity is the source of truth.
+  `npm run sanity:import` only creates missing documents; `-- --force`
+  overwrites Sanity with the seed.
+
+**One-time Sanity setup** (sanity.io/manage → project `n4i8duqa` → API):
+
+1. **CORS origins** → add `http://localhost:3000`,
+   `https://sobajo-grill.vercel.app` (and `https://sobajogrill.com` later),
+   each with **Allow credentials** ticked — needed for the Studio to log in.
+2. **Webhooks** → Create: URL `https://sobajo-grill.vercel.app/api/revalidate`,
+   dataset `production`, trigger on Create/Update/Delete, filter empty,
+   HTTP method POST, **Secret** = the value of `SANITY_REVALIDATE_SECRET`.
+3. **Vercel** → Settings → Environment Variables: add
+   `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`,
+   `NEXT_PUBLIC_SANITY_API_VERSION` and `SANITY_REVALIDATE_SECRET`. Not the
+   write token — the site only reads public content.
+
 ## What's included
 
 - **Pages**
@@ -31,13 +75,13 @@ branch gets its own preview URL.
     (teaser → full menu), catering teaser, delivery, story, reviews, shipping,
     FAQ.
   - `/menu/` — full menu with a sticky scroll-synced category bar; each
-    section picks a layout (`feature` · `cards` · `tiers` · `list`) in
-    `lib/menu.ts`.
+    section picks a layout (`feature` · `cards` · `tiers` · `list`) in the
+    Studio.
   - `/catering/` — campaign landing page: occasions, tray × pan-size pricing
     matrix, Ndokoti platters, how it works, catering FAQ, quote CTAs.
 - **Ordering** — native `<dialog>` item customizer and cart sheet (pickup /
   delivery, $100 minimum progress, inline validation) → Square hosted
-  checkout: `POST /api/checkout` reprices the cart from `lib/menu.ts` and
+  checkout: `POST /api/checkout` reprices the cart from the Sanity menu and
   creates a one-time Square payment link (`lib/square.ts`). The
   cart lives in the root layout, so it follows the guest across pages, and
   persists in `localStorage`.
@@ -78,11 +122,11 @@ branch gets its own preview URL.
   `lib/reviews.ts`. Paste real Google reviews there (author, rating, link);
   only entries with a Google link are labeled "Google review".
 
-- **Campaigns** — each entry in `lib/campaigns.ts` becomes a landing page at
+- **Campaigns** — each campaign in the Studio becomes a landing page at
   `/<slug>/` (own SEO title, share image `/<slug>/og.png`, sitemap entry,
   FAQ JSON-LD) plus a site-wide announcement bar during its banner window.
-  Featured dishes are referenced by menu name (prices stay in sync; a typo
-  fails the build). Pages carry a **pre-order request** form → `/api/leads`
+  Featured dishes are references to menu items, so prices stay in sync; a
+  new campaign gets its page without a deploy. Pages carry a **pre-order request** form → `/api/leads`
   (kind `preorder`) → CRM Opportunity with the guest's cart. Pages
   re-render hourly, so the bar switches on/off by date without a deploy.
   Launch ads with tagged links, e.g.
@@ -98,12 +142,14 @@ forms offer an email fallback rather than silently dropping leads.
 
 ```
 app/
-  layout.tsx          # fonts, site-wide metadata + Restaurant JSON-LD, nav/footer/cart shell
-  page.tsx            # home
-  menu/page.tsx       # full menu
-  catering/page.tsx   # catering landing page
-  [campaign]/         # campaign landing pages + per-campaign og.png (from lib/campaigns.ts)
-  privacy/page.tsx    # privacy policy
+  layout.tsx          # <html>, fonts, site-wide metadata (shared with /studio)
+  (site)/layout.tsx   # Restaurant JSON-LD, nav/footer/cart shell, SiteProvider
+  (site)/page.tsx     # home
+  (site)/menu/        # full menu
+  (site)/catering/    # catering landing page
+  (site)/[campaign]/  # campaign landing pages + per-campaign og.png (from Sanity)
+  (site)/privacy/     # privacy policy
+  studio/[[...tool]]/ # Sanity Studio
   globals.css         # design tokens + all component styles
   og.png/route.tsx    # 1200×630 social share card (build-time ImageResponse)
   sitemap.ts robots.ts manifest.ts icon.png apple-icon.png
@@ -118,24 +164,30 @@ components/
   nav hero marquee experiences catering delivery story reviews shipping
   cta footer item-modal cart-modal cart-fab
 app/api/leads/route.ts   # lead intake → CRM + notification
+app/api/revalidate/route.ts # Sanity publish webhook → cache refresh
+sanity/               # schemaTypes/ (content model), structure.ts (Studio sidebar), env.ts
+scripts/sanity-import.ts # one-time seed → Sanity import
 app/api/google-place/route.ts # live Google rating/reviews/hours (never cached)
 lib/
+  content.ts          # Sanity → MenuItem/Campaign/Site/FAQ loader (cached, tag "sanity")
+  sanity.ts           # Sanity client + image URLs
   leads/              # schema.ts (validation), twenty.ts (CRM), notify.ts (webhook)
   attribution.ts      # first/last-touch UTM + click-ID capture
   analytics.ts        # track() → GA4 + Meta Pixel
-  site.ts             # business facts: name, address, phone, socials, hours, SITE_URL
+  site.ts             # Site type, fixed brand facts, SITE_URL (+ seed business info)
   seo.ts              # pageMetadata() + shared OG image
-  campaigns.ts        # marketing campaigns (Thanksgiving…)
+  campaigns.ts        # Campaign type + helpers (+ seed: Thanksgiving)
   og.tsx              # share-card renderer
-  menu.ts             # items, variations, prices, delivery rules
-  faq.ts              # home + catering FAQ copy (rendered + JSON-LD)
+  menu.ts             # MenuItem/MenuSection types, side choices (+ seed menu)
+  faq.ts              # seed FAQ copy (live FAQs are in Sanity)
   structured-data.ts  # schema.org JSON-LD builders
 ```
 
 ## Before going live
 
-- **Business facts live in `lib/site.ts`** — fill in `hours` (feeds Google's
-  "Open now"); confirm phone, email and social URLs.
+- **Business info lives in the Studio** (`/studio` → Business info) — fill
+  in opening hours (feeds Google's "Open now"); confirm phone, email and
+  social links.
 - **Custom domain** — point `sobajogrill.com` at Pages, then set
   `NEXT_PUBLIC_SITE_URL=https://sobajogrill.com` and drop
   `NEXT_PUBLIC_BASE_PATH` in the workflow. `robots.txt` is only honored at a
@@ -145,6 +197,7 @@ lib/
   any future expiry, CVV `111`, any ZIP. Set `SQUARE_ENVIRONMENT=production`
   with production credentials to go live. Orders show up in the Square
   Dashboard with pickup/delivery details in the payment note.
-- Menu card photos are Unsplash placeholders (`lib/menu.ts`) — swap in real
-  Sobajo food photography; `public/hero.jpg` is the only real dish photo today.
+- Menu card photos are Unsplash placeholders (imported into Sanity) — upload
+  real Sobajo food photography per item in the Studio; the brisket suya
+  (`hero.jpg`) is the only real dish photo today.
 - Reviews in `components/reviews.tsx` are static — wire to Google reviews.

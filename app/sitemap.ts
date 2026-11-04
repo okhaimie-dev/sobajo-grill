@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
-import { CAMPAIGNS } from "@/lib/campaigns";
+import { getCampaigns } from "@/lib/content";
 import { absoluteUrl } from "@/lib/site";
 
-export const dynamic = "force-static";
+// Refreshed with the content, so new campaigns appear without a deploy.
+export const revalidate = 3600;
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const campaigns = await getCampaigns();
   const lastModified = new Date();
   return [
     {
@@ -22,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
       images: [absoluteUrl("/catering.jpg")],
     },
-    ...CAMPAIGNS.map((c) => ({
+    ...campaigns.map((c) => ({
       url: absoluteUrl(`/${c.slug}/`),
       lastModified,
       changeFrequency: "weekly" as const,

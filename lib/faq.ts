@@ -19,7 +19,7 @@ export const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Do you cater events?",
-    a: "Yes — we cater offices, churches, birthdays, graduations, weddings, watch parties and community events. Catering trays come in half and full pans (shallow or deep) of brisket suya, Obasanjo Fire Chicken, BBQ chicken, turkey wings, fire wings and grilled fish.",
+    a: "Yes — we cater offices, churches, birthdays, graduations, weddings, watch parties and community events. Catering trays come in half pans (shallow or deep) and full trays of brisket suya, Obasanjo Fire Chicken, BBQ chicken, turkey wings, fire wings and grilled fish.",
   },
   {
     q: "How spicy is the food?",
@@ -43,7 +43,7 @@ export const CATERING_FAQS: { q: string; a: string }[] = [
   },
   {
     q: "What tray sizes do you offer?",
-    a: "Catering trays come in half and full pans, each in shallow or deep — Half Shallow, Half Deep, Full Shallow and Full Deep. Prices for every size are listed on this page.",
+    a: "Catering trays come in three sizes: Half Shallow, Half Deep and Full Tray. Prices for every size are listed on this page.",
   },
   {
     q: "Do you deliver catering orders?",

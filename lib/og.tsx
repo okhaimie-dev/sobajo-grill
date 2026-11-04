@@ -9,7 +9,14 @@ import { ImageResponse } from "next/og";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 
+/** A /public file, or a remote image (Sanity CDN, fetched as JPEG). */
 async function dataUri(file: string, mime: string): Promise<string> {
+  if (/^https?:/.test(file)) {
+    const res = await fetch(file, { headers: { Accept: "image/jpeg,image/png" } });
+    if (!res.ok) throw new Error(`OG image: ${res.status} fetching ${file}`);
+    const type = res.headers.get("content-type") ?? mime;
+    return `data:${type};base64,${Buffer.from(await res.arrayBuffer()).toString("base64")}`;
+  }
   const buf = await readFile(join(process.cwd(), "public", file));
   return `data:${mime};base64,${buf.toString("base64")}`;
 }
@@ -35,7 +42,7 @@ export async function renderOg({
   line1: string;
   line2: string;
   footer: string;
-  /** File in /public. */
+  /** File in /public, or an absolute image URL (JPEG/PNG). */
   image?: string;
 }) {
   const [photo, logo, bold, semi] = await Promise.all([

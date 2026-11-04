@@ -1,5 +1,6 @@
 import { after } from "next/server";
 import { notifyWebhook, webhookConfigured } from "@/lib/leads/notify";
+import { getCampaigns } from "@/lib/content";
 import { parseLead } from "@/lib/leads/schema";
 import { sendToTwenty, twentyConfigured } from "@/lib/leads/twenty";
 
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
   // Honeypot: a hidden field real visitors never fill in. Pretend success.
   if (typeof body.company === "string" && body.company.trim()) return json(200, { ok: true });
 
-  const lead = parseLead(body);
+  const lead = parseLead(body, await getCampaigns().catch(() => []));
   if (typeof lead === "string") return json(400, { error: lead });
 
   if (!twentyConfigured() && !webhookConfigured()) {

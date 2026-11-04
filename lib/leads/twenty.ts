@@ -11,7 +11,6 @@
  * (name, emails, phones; note.bodyV2; noteTarget.target*Id).
  */
 
-import { getCampaign } from "@/lib/campaigns";
 import { LEAD_LABELS, Lead, leadMarkdown } from "./schema";
 
 const BASE = (process.env.TWENTY_API_URL ?? "https://api.twenty.com").replace(/\/$/, "");
@@ -73,7 +72,7 @@ export async function sendToTwenty(lead: Lead): Promise<void> {
 
   let opportunityId: string | undefined;
   if (lead.kind === "catering" || lead.kind === "preorder") {
-    const label = lead.kind === "preorder" ? `${getCampaign(lead.campaign!)?.name ?? "Campaign"} pre-order` : "Catering";
+    const label = lead.kind === "preorder" ? `${lead.campaignName ?? "Campaign"} pre-order` : "Catering";
     const date = lead.kind === "preorder" ? lead.pickupDate : lead.eventDate;
     const parts = [lead.name, date ?? "date TBD", lead.guests ? `${lead.guests} guests` : null].filter(Boolean);
     const opp = await twenty<Created<"createOpportunity">>("opportunities", {
@@ -87,7 +86,7 @@ export async function sendToTwenty(lead: Lead): Promise<void> {
   const note = await twenty<Created<"createNote">>("notes", {
     method: "POST",
     body: {
-      title: `Website · ${lead.campaign ? `${getCampaign(lead.campaign)?.name} ` : ""}${LEAD_LABELS[lead.kind]}${source ? ` · via ${source}` : ""}`,
+      title: `Website · ${lead.campaignName ? `${lead.campaignName} ` : ""}${LEAD_LABELS[lead.kind]}${source ? ` · via ${source}` : ""}`,
       bodyV2: { markdown: leadMarkdown(lead) },
     },
   });

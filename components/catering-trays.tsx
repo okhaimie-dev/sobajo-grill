@@ -1,10 +1,8 @@
 "use client";
 
-import { MenuItem, price } from "@/lib/menu";
+import { MenuItem, price, unavailableLabel } from "@/lib/menu";
 import { useCart } from "./cart-context";
 import { Icon } from "./icons";
-
-const SIZES = ["Half Shallow", "Half Deep", "Full Shallow", "Full Deep"] as const;
 
 /**
  * Size → price for a tray. Variations like "Tilapia — Half Deep" are split
@@ -22,9 +20,15 @@ function trayPrices(item: MenuItem) {
   return { bySize, options: [...options] };
 }
 
+/** Pan sizes across all trays, in the order they first appear (Half Shallow, Half Deep, Full Tray…). */
+function allSizes(items: MenuItem[]): string[] {
+  return [...new Set(items.flatMap((item) => [...trayPrices(item).bySize.keys()]))];
+}
+
 /** Pricing matrix for every catering tray × pan size; rows open the item customizer. */
 export default function CateringTrays({ items }: { items: MenuItem[] }) {
   const { configureItem } = useCart();
+  const sizes = allSizes(items);
   return (
     <div className="price-table-wrap">
       <table className="price-table">
@@ -32,7 +36,7 @@ export default function CateringTrays({ items }: { items: MenuItem[] }) {
         <thead>
           <tr>
             <th scope="col">Tray</th>
-            {SIZES.map((s) => (
+            {sizes.map((s) => (
               <th scope="col" key={s}>
                 {s}
               </th>
@@ -51,15 +55,21 @@ export default function CateringTrays({ items }: { items: MenuItem[] }) {
                   <strong>{item.name.replace(/ (Catering )?Tray$/, "")}</strong>
                   <span>{[options.join(" or "), item.name.startsWith("Fire-Grilled Fish") ? "No suya spice" : ""].filter(Boolean).join(" · ")}</span>
                 </th>
-                {SIZES.map((s) => (
+                {sizes.map((s) => (
                   <td key={s} data-label={s}>
                     {bySize.has(s) ? price(bySize.get(s)!) : <span className="na" aria-label="Not available">—</span>}
                   </td>
                 ))}
                 <td className="price-action">
-                  <button className="add-btn" onClick={() => configureItem(item)} aria-label={`Add ${item.name}`}>
-                    <Icon name="plus" /> Add
-                  </button>
+                  {unavailableLabel(item) ? (
+                    <button className="add-btn" disabled>
+                      {unavailableLabel(item)}
+                    </button>
+                  ) : (
+                    <button className="add-btn" onClick={() => configureItem(item)} aria-label={`Add ${item.name}`}>
+                      <Icon name="plus" /> Add
+                    </button>
+                  )}
                 </td>
               </tr>
             );
