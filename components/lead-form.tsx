@@ -185,7 +185,7 @@ export default function LeadForm({
           </div>
           <label className="field lead-wide">
             <span className="field-label">Anything else?</span>
-            <textarea className="input" name="message" rows={3} placeholder={delivery ? "Extra dishes, pickup or DoorDash delivery…" : "Extra dishes, preferred pickup time…"} />
+            <textarea className="input" name="message" rows={3} placeholder={delivery ? "Extra dishes, pickup or delivery…" : "Extra dishes, preferred pickup time…"} />
           </label>
         </div>
       ) : kind === "catering" ? (

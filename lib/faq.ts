@@ -15,7 +15,7 @@ export const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Do you deliver?",
-    a: "Yes — delivery is handled by DoorDash, with no order minimum; DoorDash's delivery fee is shown at checkout. You can also order ahead for pickup. For large or catering-size orders, 24 hours' notice is preferred.",
+    a: "Yes — our own team delivers across Baltimore City and Baltimore County, MD. Delivery orders start at $120, with a flat $10 delivery fee. Pickup is available for any size order. For large or catering-size orders, 24 hours' notice is preferred.",
   },
   {
     q: "Do you cater events?",
@@ -47,7 +47,7 @@ export const CATERING_FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Do you deliver catering orders?",
-    a: `Yes — catering delivery is handled by DoorDash, and DoorDash's delivery fee is shown at checkout. Pickup is available at ${SITE.address.street}, ${SITE.address.city}.`,
+    a: `Yes — our own team delivers catering across Baltimore City and Baltimore County, MD (orders from $120, flat $10 delivery fee). Pickup is available at ${SITE.address.street}, ${SITE.address.city}.`,
   },
   {
     q: "What events do you cater?",

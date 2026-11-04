@@ -36,7 +36,7 @@ export interface Campaign {
   hero: { eyebrow: string; title: string; accent: string; lede: string; image: string; imageAlt: string };
   /** Share-image headline (two lines). */
   og: { line1: string; line2: string };
-  /** DoorDash delivery offered for this campaign; false → pickup only (page copy follows). */
+  /** Delivery offered for this campaign; false → pickup only (page copy follows). */
   delivery: boolean;
   /** Guests pay online via the cart (paid orders → CRM); false → pre-order request form. */
   orderOnline?: boolean;

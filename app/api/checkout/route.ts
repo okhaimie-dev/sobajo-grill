@@ -1,5 +1,5 @@
 import { BASE_PATH } from "@/lib/assets";
-import { getMenu } from "@/lib/content";
+import { getMenu, getSite } from "@/lib/content";
 import { shortDay, todayInBaltimore } from "@/lib/campaigns";
 import { MenuItem, allowedPickupDays, sideOptions } from "@/lib/menu";
 import { SquareLineItem, createPaymentLink, squareConfigured } from "@/lib/square";
@@ -87,6 +87,15 @@ export async function POST(request: Request) {
   if (isDelivery && pickupOnly) return json(400, { error: `${pickupOnly.name} is pickup only — please choose pickup.` });
   const address = str(body.address, 300);
   if (isDelivery && !address) return json(400, { error: "Please enter a delivery address." });
+  if (isDelivery) {
+    // In-house delivery: minimum on the food total, flat fee as its own line (Sanity → Business info).
+    const { minimum, fee } = (await getSite()).delivery;
+    const food = lineItems.reduce((sum, l) => sum + l.unitPrice * l.quantity, 0);
+    if (food < minimum) {
+      return json(400, { error: `Delivery orders start at $${minimum} — add $${(minimum - food).toFixed(2)} more, or choose pickup.` });
+    }
+    if (fee > 0) lineItems.push({ name: "Delivery fee", variationName: "In-house delivery", quantity: 1, unitPrice: fee });
+  }
   const time = str(body.time, 40);
 
   // Campaign items (e.g. the Thanksgiving turkey) can only be picked up on their days.

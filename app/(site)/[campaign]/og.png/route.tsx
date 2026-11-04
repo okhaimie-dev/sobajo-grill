@@ -17,7 +17,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ campaig
     eyebrow: `${campaign.name} at ${site.name}`,
     line1: campaign.og.line1,
     line2: campaign.og.line2,
-    footer: `Pre-order for ${campaign.delivery ? "pickup or DoorDash delivery" : "pickup"} — ${site.address.street}, ${site.address.city}`,
+    footer: `Pre-order for ${campaign.delivery ? "pickup or delivery" : "pickup"} — ${site.address.street}, ${site.address.city}`,
     // Sanity: ask the CDN for a JPEG at card size (Satori can't read WebP/AVIF).
     image: img.startsWith("http") ? `${img.replace("auto=format&", "")}&w=1200&h=630&fit=crop&fm=jpg` : img.replace(/^\//, ""),
   });

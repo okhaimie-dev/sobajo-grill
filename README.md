@@ -98,7 +98,9 @@ with their Sanity account; invite them at sanity.io/manage → project
   - `/catering/` — campaign landing page: occasions, tray × pan-size pricing
     matrix, Ndokoti platters, how it works, catering FAQ, quote CTAs.
 - **Ordering** — native `<dialog>` item customizer and cart sheet (pickup /
-  delivery, $100 minimum progress, inline validation) → Square hosted
+  in-house delivery — minimum, flat fee and area set in the Studio under
+  Business info → Delivery, enforced again by checkout, the fee added as its
+  own Square line — inline validation) → Square hosted
   checkout: `POST /api/checkout` reprices the cart from the Sanity menu and
   creates a one-time Square payment link (`lib/square.ts`). The
   cart lives in the root layout, so it follows the guest across pages, and

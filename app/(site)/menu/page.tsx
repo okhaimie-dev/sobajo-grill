@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getMenu } from "@/lib/content";
+import { getMenu, getSite } from "@/lib/content";
+import { price } from "@/lib/menu";
 import { pageMetadata } from "@/lib/seo";
 import { menuJsonLd } from "@/lib/structured-data";
 import Cta from "@/components/cta";
@@ -16,7 +17,7 @@ export const metadata = pageMetadata({
 });
 
 export default async function MenuPage() {
-  const { sections } = await getMenu();
+  const [{ sections }, site] = await Promise.all([getMenu(), getSite()]);
   return (
     <>
       <JsonLd data={menuJsonLd(sections)} />
@@ -40,7 +41,7 @@ export default async function MenuPage() {
             <Icon name="store" /> Pickup in Baltimore
           </span>
           <span>
-            <Icon name="truck" /> Delivery via DoorDash · no minimum
+            <Icon name="truck" /> In-house delivery · {price(site.delivery.minimum)} minimum
           </span>
           <Link href="/catering/">
             <Icon name="users" /> Catering trays

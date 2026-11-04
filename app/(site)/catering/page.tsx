@@ -13,7 +13,7 @@ import PageHero from "@/components/page-hero";
 
 export const metadata = pageMetadata({
   title: "Catering in Baltimore — African BBQ & Suya Trays",
-  description: `Cater your next event with Sobajo Grill: half and full pans of beef brisket suya, Obasanjo Fire Chicken, wings, turkey wings and grilled fish. Pickup in Baltimore or delivery via DoorDash. Trays from $50.`,
+  description: `Cater your next event with Sobajo Grill: half and full pans of beef brisket suya, Obasanjo Fire Chicken, wings, turkey wings and grilled fish. Pickup in Baltimore or in-house delivery across Baltimore City & County. Trays from $50.`,
   path: "/catering/",
 });
 
@@ -30,7 +30,7 @@ const OCCASIONS: { label: string; text: string; icon: IconName }[] = [
 const STEPS = [
   ["Choose your trays", "Pick dishes and pan sizes below, or ask us to build the spread."],
   ["Set the date", "24 hours' notice preferred — earlier for big events."],
-  ["Pickup or delivery", "Pick up at our Liberty Road kitchen, or get it delivered via DoorDash."],
+  ["Pickup or delivery", "Pick up at our Liberty Road kitchen, or our own team delivers across Baltimore City & County."],
   ["We bring the fire", "Everything arrives hot, with onions and Sobajo hot sauce."],
 ];
 
@@ -73,7 +73,7 @@ export default async function CateringPage() {
             <Icon name="package" /> Half &amp; full pans
           </span>
           <span>
-            <Icon name="truck" /> Pickup or DoorDash delivery
+            <Icon name="truck" /> Pickup or in-house delivery
           </span>
           <span>
             <Icon name="clock" /> 24 hrs notice preferred
@@ -204,7 +204,7 @@ export default async function CateringPage() {
         <div className="container">
           <div className="cta-band">
             <h2 id="catering-cta-title">Bring the fire to your event.</h2>
-            <p>Tell us about your gathering and we&apos;ll handle the rest — pickup or delivery via DoorDash.</p>
+            <p>Tell us about your gathering and we&apos;ll handle the rest — pickup, or delivered by our own team.</p>
             <div className="hero-actions">
               <a className="btn btn-dark" href="#quote">
                 <Icon name="mail" /> Request a quote

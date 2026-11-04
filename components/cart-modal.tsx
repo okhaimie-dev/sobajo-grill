@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { shortDay, todayInBaltimore } from "@/lib/campaigns";
 import { CartLine, allowedPickupDays, money } from "@/lib/menu";
 import { useCart } from "./cart-context";
+import { useSite } from "./site-context";
 import { Icon } from "./icons";
 import { useDialog } from "./use-dialog";
 
@@ -49,7 +50,13 @@ export default function CartModal() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
+  // An error about the old cart (delivery minimum, quantity) shouldn't outlive a cart change.
+  useEffect(() => setError(null), [subtotal]);
+
   const submit = async () => {
+    if (isDelivery && deliveryShort > 0) {
+      return setError(`Delivery orders start at ${money(minimum)} — add ${money(deliveryShort)} more, or choose pickup.`);
+    }
     if (pickupDays) {
       if (!pickupDays.length) return setError("The pickup days for an item in your cart have passed — please remove it.");
       if (!pickupDays.includes(pickupDay)) return setError("Please choose a pickup day.");
@@ -68,6 +75,10 @@ export default function CartModal() {
   // Any pickup-only item (e.g. the Thanksgiving turkey) makes the whole order pickup.
   const pickupOnly = lines.filter((l) => l.pickupOnly).map((l) => l.name);
   const isDelivery = pickupOnly.length === 0 && orderType === "delivery";
+  // In-house delivery: food total must reach the minimum; flat fee on top.
+  const { minimum, fee, area } = useSite().delivery;
+  const deliveryShort = Math.max(0, minimum - subtotal);
+  const total = subtotal + (isDelivery ? fee : 0);
   const pickupDays = allowedPickupDays(
     lines.map((l) => l.pickupDates),
     todayInBaltimore()
@@ -142,8 +153,10 @@ export default function CartModal() {
               )}
 
               {isDelivery && (
-                <div className="notice" role="status">
-                  Delivered by DoorDash — no order minimum. DoorDash&apos;s delivery fee is shown at checkout.
+                <div className={`notice${deliveryShort > 0 ? " error" : ""}`} role="status">
+                  {deliveryShort > 0
+                    ? `Delivery starts at ${money(minimum)} — add ${money(deliveryShort)} more, or choose pickup.`
+                    : `Delivered by our own team across ${area}${fee ? ` · ${money(fee)} delivery fee` : " · free delivery"}.`}
                 </div>
               )}
 
@@ -219,12 +232,12 @@ export default function CartModal() {
                 {isDelivery && (
                   <div className="summary-row">
                     <span>Delivery fee</span>
-                    <span>Set by DoorDash</span>
+                    <span>{fee ? money(fee) : "Free"}</span>
                   </div>
                 )}
                 <div className="summary-row total">
-                  <span>{isDelivery ? "Total before delivery" : "Total"}</span>
-                  <span>{money(subtotal)}</span>
+                  <span>Total</span>
+                  <span>{money(total)}</span>
                 </div>
               </div>
             </>
@@ -240,7 +253,7 @@ export default function CartModal() {
             </div>
           )}
           <button className="btn btn-primary btn-block" onClick={submit} disabled={pending}>
-            {pending ? "Starting secure checkout…" : `Continue to secure checkout · ${money(subtotal)}`}
+            {pending ? "Starting secure checkout…" : `Continue to secure checkout · ${money(total)}`}
           </button>
           <button className="link-btn muted-link" style={{ justifySelf: "center", alignSelf: "center" }} onClick={clearCart}>
             Clear cart

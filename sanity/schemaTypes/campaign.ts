@@ -71,7 +71,7 @@ export const campaign = defineType({
     }),
     defineField({
       name: "delivery",
-      title: "Offer delivery (DoorDash)",
+      title: "Offer delivery",
       description: "Off → the page says pickup only. To stop featured dishes being delivered, also tick “Pickup only” on those menu items.",
       type: "boolean",
       group: "basics",

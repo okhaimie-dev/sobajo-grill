@@ -1,19 +1,21 @@
 "use client";
 
+import { price } from "@/lib/menu";
 import { useCart } from "./cart-context";
 import { useSite } from "./site-context";
 import { Icon, IconName } from "./icons";
 
-const STATS: { icon: IconName; value: string; label: string }[] = [
-  { icon: "bag", value: "No minimum", label: "Order exactly what you're craving" },
-  { icon: "store", value: "Pickup", label: "Order ahead on Liberty Road" },
-  { icon: "clock", value: "24 hrs", label: "Advance notice preferred" },
-  { icon: "truck", value: "DoorDash", label: "Delivered by DoorDash Dashers" },
-];
-
+/** In-house delivery; minimum, fee and area come from Sanity → Business info → Delivery. */
 export default function Delivery() {
   const site = useSite();
   const { openCart } = useCart();
+  const { minimum, fee, area } = site.delivery;
+  const stats: { icon: IconName; value: string; label: string }[] = [
+    { icon: "truck", value: "Our own drivers", label: area },
+    { icon: "bag", value: `${price(minimum)} minimum`, label: fee ? `Flat ${price(fee)} delivery fee` : "Free delivery" },
+    { icon: "store", value: "Pickup", label: "Any size order, on Liberty Road" },
+    { icon: "clock", value: "24 hrs", label: "Advance notice preferred for big orders" },
+  ];
 
   return (
     <section className="section delivery" id="delivery" aria-labelledby="delivery-title">
@@ -21,20 +23,19 @@ export default function Delivery() {
         <div className="section-head">
           <div>
             <div className="eyebrow">
-              <Icon name="truck" /> Delivery via DoorDash
+              <Icon name="truck" /> In-house delivery
             </div>
             <h2 className="section-title" id="delivery-title">
               Fresh. Hot. <em>Delivered.</em>
             </h2>
           </div>
           <p className="section-lede">
-            Delivery for family meals, game nights, office lunches and catering — brought to
-            your door by DoorDash, with no order minimum.
+            {`Family meals, game nights, office lunches and catering — delivered hot by our own team across ${area}. Orders from ${price(minimum)}${fee ? `, flat ${price(fee)} delivery fee` : ", free delivery"}.`}
           </p>
         </div>
 
         <div className="stat-grid">
-          {STATS.map((s) => (
+          {stats.map((s) => (
             <div className="stat" key={s.label}>
               <Icon name={s.icon} />
               <strong>{s.value}</strong>
@@ -53,7 +54,7 @@ export default function Delivery() {
           <li className="step">
             <div>
               <strong>Choose delivery</strong>
-              <span>Add your address and preferred time.</span>
+              <span>{`Orders of ${price(minimum)}+ — add your address and preferred time.`}</span>
             </div>
           </li>
           <li className="step">
@@ -66,11 +67,6 @@ export default function Delivery() {
             <button className="btn btn-primary" onClick={openCart}>
               Review my order <Icon name="arrow" />
             </button>
-            {site.doordashUrl && (
-              <a className="btn btn-ghost" href={site.doordashUrl} target="_blank" rel="noopener noreferrer">
-                Order on DoorDash
-              </a>
-            )}
           </li>
         </ol>
       </div>

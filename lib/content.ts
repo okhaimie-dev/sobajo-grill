@@ -69,7 +69,8 @@ interface Raw {
   site: {
     phone: string; email: string; address: Site["address"] & { country?: string };
     hours?: { days: string[]; opens: string; closes: string }[];
-    googleRating: number; googleReviewUrl?: string; doordashUrl?: string; cashAppUrl?: string;
+    googleRating: number; googleReviewUrl?: string; cashAppUrl?: string;
+    deliveryMinimum?: number; deliveryFee?: number; deliveryArea?: string;
     instagram?: { handle?: string; url?: string }; tiktok?: { handle?: string; url?: string };
     tagline: string; seoTitle: string; seoDescription: string; keywords?: string[];
   } | null;
@@ -113,7 +114,11 @@ function normalize(raw: Raw): Content {
     },
     cashAppUrl: s.cashAppUrl ?? "",
     googleReviewUrl: s.googleReviewUrl ?? null,
-    doordashUrl: s.doordashUrl ?? null,
+    delivery: {
+      minimum: s.deliveryMinimum ?? SITE.delivery.minimum,
+      fee: s.deliveryFee ?? SITE.delivery.fee,
+      area: s.deliveryArea || SITE.delivery.area,
+    },
     googleRating: s.googleRating,
     hours: s.hours ?? [],
   };

@@ -70,8 +70,12 @@ export const SITE = {
    * reviews" (looks like https://g.page/r/…/review). TODO: paste it here.
    */
   googleReviewUrl: null as string | null,
-  /** DoorDash store page — TODO: paste the listing URL; "Order on DoorDash" buttons appear once set. */
-  doordashUrl: null as string | null,
+  /** In-house delivery (our own drivers): order minimum and flat fee in dollars, before fee. */
+  delivery: {
+    minimum: 120,
+    fee: 10,
+    area: "Baltimore City & Baltimore County, MD",
+  },
   priceRange: "$$",
   /**
    * Google star rating shown in the hero. Update by hand now and then — the

@@ -84,8 +84,8 @@ export function allowedPickupDays(lists: (string[] | undefined)[], today: string
   return restricted.reduce((acc, l) => acc.filter((d) => l.includes(d))).filter((d) => d >= today);
 }
 
-// Delivery is fulfilled by DoorDash: no order minimum, and the delivery fee
-// is DoorDash's (shown at checkout) — so neither is modeled here.
+// Delivery is in-house: minimum, flat fee and area live in Sanity → Business
+// info → Delivery (Site.delivery); the cart and /api/checkout apply them.
 
 export function money(v: number): string {
   return "$" + v.toFixed(2);

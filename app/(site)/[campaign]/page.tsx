@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { asset } from "@/lib/assets";
 import { formatDay } from "@/lib/campaigns";
 import { getCampaign, getCampaigns, getContent } from "@/lib/content";
-import { MenuItem, sectionById } from "@/lib/menu";
+import { MenuItem, price, sectionById } from "@/lib/menu";
 import { OG_IMAGE, pageMetadata } from "@/lib/seo";
 import { SITE, absoluteUrl } from "@/lib/site";
 import { faqJsonLd } from "@/lib/structured-data";
@@ -127,7 +127,7 @@ export default async function CampaignPage({ params }: Props) {
           )}
           {c.delivery ? (
             <span>
-              <Icon name="truck" /> Pickup or DoorDash delivery
+              <Icon name="truck" /> Pickup or delivery
             </span>
           ) : (
             <span>
@@ -259,7 +259,7 @@ export default async function CampaignPage({ params }: Props) {
               </div>
               <div>
                 <dt>Delivery</dt>
-                <dd>{c.delivery ? "Via DoorDash" : "Not available — pickup only"}</dd>
+                <dd>{c.delivery ? `By our own team · ${price(site.delivery.minimum)} minimum` : "Not available — pickup only"}</dd>
               </div>
             </dl>
           </div>

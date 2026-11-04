@@ -11,7 +11,7 @@ import PageHero from "@/components/page-hero";
  * Not legal advice — have the owner (and ideally a lawyer) review it.
  */
 
-const UPDATED = "October 21, 2026";
+const UPDATED = "November 4, 2026";
 
 export const metadata = pageMetadata({
   title: "Privacy Policy",
@@ -53,8 +53,8 @@ export default async function PrivacyPage() {
             </li>
             <li>
               <strong>Orders and payments</strong> are completed on our payment provider&apos;s checkout (Square).
-              We don&apos;t receive or store your card details. Delivery orders are fulfilled by DoorDash, which
-              handles your delivery information under its own privacy policy.
+              We don&apos;t receive or store your card details. For delivery orders we use your address and phone
+              number only to deliver your order with our own drivers.
             </li>
           </ul>
 
@@ -98,8 +98,7 @@ export default async function PrivacyPage() {
           <p>
             We share information only with service providers that help us run the business, and only for that
             purpose: our website host, our customer-relationship (CRM) system where requests are recorded, the
-            team messaging tool that notifies us of new requests, our payment provider (Square), DoorDash for
-            deliveries, and — when enabled — Google and Meta for analytics and advertising.
+            team messaging tool that notifies us of new requests, our payment provider (Square), and — when enabled — Google and Meta for analytics and advertising.
           </p>
           <p>
             We do not sell your personal information for money. Using advertising cookies to measure and target
