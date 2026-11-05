@@ -20,7 +20,7 @@ export default async function Hero() {
       />
       <div className="container hero-content">
         <div className="eyebrow">
-          <Icon name="flame" /> Baltimore Suya &amp; African Grill
+          <Icon name="flame" /> Baltimore Suya
         </div>
         <h1 id="hero-title">
           Fire. Flavor. <span className="accent">Friendship.</span>
