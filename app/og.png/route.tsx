@@ -9,7 +9,7 @@ export const revalidate = 3600;
 export async function GET() {
   const site = await getSite();
   return renderOg({
-    eyebrow: "Baltimore Suya & African Grill",
+    eyebrow: "Baltimore Suya",
     line1: "Fire. Flavor.",
     line2: "Friendship.",
     footer: `Pickup · Delivery · Catering — ${site.address.street}, ${site.address.city}`,

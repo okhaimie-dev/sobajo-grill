@@ -32,7 +32,7 @@ export function absoluteUrl(path = "/"): string {
 export const SITE = {
   name: "Sobajo Grill",
   tagline: "Fire. Flavor. Friendship.",
-  title: "Sobajo Grill — Baltimore Suya, BBQ & African Grill | Catering & Delivery",
+  title: "Sobajo Grill — Baltimore Suya, BBQ | Catering & Delivery",
   description:
     "Fire-grilled beef brisket suya, Obasanjo Fire Chicken, jollof rice and plantains in Baltimore, MD. Nigerian & Cameroonian-rooted African barbecue for pickup, local delivery and event catering.",
   keywords: [
